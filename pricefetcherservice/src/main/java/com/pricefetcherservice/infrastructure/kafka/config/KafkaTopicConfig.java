@@ -1,4 +1,4 @@
-package com.pricefetcherservice.kafka.config;
+package com.pricefetcherservice.infrastructure.kafka.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;

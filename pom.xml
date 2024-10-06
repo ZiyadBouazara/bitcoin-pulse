@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>basedomain</module>
         <module>pricefetcherservice</module>
         <module>stockservice</module>
     </modules>

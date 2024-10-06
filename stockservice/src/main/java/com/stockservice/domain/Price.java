@@ -1,4 +1,4 @@
-package com.basedomain.dto;
+package com.stockservice.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

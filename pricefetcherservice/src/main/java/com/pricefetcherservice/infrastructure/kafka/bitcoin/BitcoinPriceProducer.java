@@ -1,7 +1,7 @@
-package com.pricefetcherservice.kafka.bitcoin;
+package com.pricefetcherservice.infrastructure.kafka.bitcoin;
 
-import com.basedomain.dto.PriceEvent;
-import com.pricefetcherservice.kafka.PriceProducer;
+import com.pricefetcherservice.domain.PriceEvent;
+import com.pricefetcherservice.infrastructure.kafka.PriceProducer;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

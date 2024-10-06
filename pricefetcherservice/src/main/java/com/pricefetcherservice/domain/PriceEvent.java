@@ -1,4 +1,4 @@
-package com.basedomain.dto;
+package com.pricefetcherservice.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

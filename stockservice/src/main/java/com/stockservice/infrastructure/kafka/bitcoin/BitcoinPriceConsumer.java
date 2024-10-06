@@ -1,7 +1,7 @@
-package com.stockservice.kafka.bitcoin;
+package com.stockservice.infrastructure.kafka.bitcoin;
 
-import com.basedomain.dto.PriceEvent;
-import com.stockservice.kafka.PriceConsumer;
+import com.stockservice.domain.PriceEvent;
+import com.stockservice.infrastructure.kafka.PriceConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
