@@ -1,26 +1,11 @@
 package com.pricefetcherservice.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
 public class PriceEvent {
-    private String message;
-    private String status;
-    private Price price;
-
-    @Override
-    public String toString() {
-        return "PriceEvent {" +
-            "message='" + message + '\'' +
-            ", status='" + status + '\'' +
-            ", order=" + price +
-            '}';
-    }
-
+    private String timestamp;
+    private double price;
 }

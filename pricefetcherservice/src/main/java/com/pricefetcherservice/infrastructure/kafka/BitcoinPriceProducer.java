@@ -1,7 +1,7 @@
-package com.pricefetcherservice.infrastructure.kafka.bitcoin;
+package com.pricefetcherservice.infrastructure.kafka;
 
 import com.pricefetcherservice.domain.PriceEvent;
-import com.pricefetcherservice.infrastructure.kafka.PriceProducer;
+import com.pricefetcherservice.domain.PriceProducer;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public class BitcoinPriceProducer implements PriceProducer {
 
     @Override
     public void sendPrice(PriceEvent priceEvent) {
-        logger.info(String.format("Bitcoin Price Event => %s", priceEvent));
+        logger.info("Bitcoin Price Event => {}", priceEvent);
 
         Message<PriceEvent> message =
             MessageBuilder.withPayload(priceEvent).setHeader(KafkaHeaders.TOPIC, bitcoinPriceTopic.name()).build();

@@ -1,24 +1,14 @@
 package com.pricefetcherservice.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Price {
+    private String currency;
+    private String timestamp;
     private double price;
-    private double timestamp;
-
-    @Override
-    public String toString() {
-        return "Price {" +
-            "timestamp='" + timestamp + '\'' +
-            ", price=" + price +
-            '}';
-    }
-
 }
