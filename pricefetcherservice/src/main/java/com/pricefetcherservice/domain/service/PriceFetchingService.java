@@ -6,8 +6,10 @@ import com.pricefetcherservice.domain.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
 import com.pricefetcherservice.domain.StockSymbols;
 import com.pricefetcherservice.infrastructure.websocket.CoinbaseWebSocketClient;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -22,6 +24,7 @@ public class PriceFetchingService {
     private PriceProducer bitcoinPriceProducer;
     private CoinbaseWebSocketClient coinbaseWebSocketClient;
 
+    @Async
     @EventListener(ApplicationReadyEvent.class)
     public void startFetching() {
         coinbaseWebSocketClient.connect(SUPPORTED_STOCKS.stream().map(StockSymbols::toString).toList());

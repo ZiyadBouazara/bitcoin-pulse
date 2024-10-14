@@ -4,12 +4,14 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketState;
 import com.pricefetcherservice.infrastructure.dtos.SubscribePriceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class CoinbaseWebSocketClient {
                     if (newState == WebSocketState.OPEN) {
                         String subscribeMessage = new SubscribePriceDTO(stocks).toString();
                         ws.sendText(subscribeMessage);
+                        logger.info("Subscribing message sent: " + subscribeMessage);
                     }
                 }
 
@@ -43,6 +46,17 @@ public class CoinbaseWebSocketClient {
                         priceUpdateListener.onPriceUpdate(message);
                     }
                     logger.info("Received message: " + message);
+                }
+
+                @Override
+                public void onConnectError(WebSocket websocket, WebSocketException exception) {
+                    logger.error("WebSocket connection error: " + exception.getMessage(), exception);
+                }
+
+                @Override
+                public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
+                                           boolean closedByServer) {
+                    logger.info("WebSocket disconnected. Closed by server: " + closedByServer);
                 }
 
                 @Override
