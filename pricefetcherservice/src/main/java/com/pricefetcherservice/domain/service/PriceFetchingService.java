@@ -6,7 +6,6 @@ import com.pricefetcherservice.domain.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
 import com.pricefetcherservice.domain.StockSymbols;
 import com.pricefetcherservice.infrastructure.websocket.CoinbaseWebSocketClient;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
