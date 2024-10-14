@@ -1,25 +1,41 @@
 package com.pricefetcherservice.domain.service;
 
-import com.pricefetcherservice.domain.Price;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pricefetcherservice.domain.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
 import com.pricefetcherservice.domain.StockSymbols;
-import com.pricefetcherservice.infrastructure.CoinbaseApiClient;
+import com.pricefetcherservice.infrastructure.websocket.CoinbaseWebSocketClient;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PriceFetchingService {
+    private static final List<StockSymbols> SUPPORTED_STOCKS = new ArrayList<>(List.of(StockSymbols.BTC_USD));
     private PriceProducer bitcoinPriceProducer;
-    private CoinbaseApiClient coinbaseApiClient;
+    private CoinbaseWebSocketClient coinbaseWebSocketClient;
 
-    public PriceFetchingService(PriceProducer bitcoinPriceProducer, CoinbaseApiClient coinbaseApiClient) {
-        this.bitcoinPriceProducer = bitcoinPriceProducer;
-        this.coinbaseApiClient = coinbaseApiClient;
+    @EventListener(ApplicationReadyEvent.class)
+    public void startFetching() {
+        coinbaseWebSocketClient.connect(SUPPORTED_STOCKS.stream().map(StockSymbols::toString).toList());
+        coinbaseWebSocketClient.setPriceUpdateListener(this::handlePriceUpdate);
     }
 
-    public void fetchAndPublishBitcoinPrice() {
-        Price bitcoinPrice = coinbaseApiClient.getPrice(StockSymbols.BTC);
-        PriceEvent priceEvent = new PriceEvent(bitcoinPrice.getTimestamp(), bitcoinPrice.getPrice());
-        bitcoinPriceProducer.sendPrice(priceEvent);
+    public PriceFetchingService(PriceProducer bitcoinPriceProducer, CoinbaseWebSocketClient coinbaseWebSocketClient) {
+        this.bitcoinPriceProducer = bitcoinPriceProducer;
+        this.coinbaseWebSocketClient = coinbaseWebSocketClient;
+    }
+
+    private void handlePriceUpdate(String priceUpdate) {
+        try {
+            PriceEvent priceEvent = new ObjectMapper().readValue(priceUpdate, PriceEvent.class);
+            bitcoinPriceProducer.sendPrice(priceEvent);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
