@@ -1,18 +1,15 @@
-package com.pricefetcherservice.domain;
+package com.stockservice.infrastructure.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Data
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
-public class PriceEvent {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class PriceEventModel {
     @JsonProperty("type")
     private String type;
 

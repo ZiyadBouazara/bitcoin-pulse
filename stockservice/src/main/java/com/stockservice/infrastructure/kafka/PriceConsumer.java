@@ -1,7 +1,7 @@
 package com.stockservice.infrastructure.kafka;
 
-import com.stockservice.domain.PriceEvent;
+import com.stockservice.infrastructure.models.PriceEventModel;
 
 public interface PriceConsumer {
-    void consume(PriceEvent priceEvent);
+    void consume(PriceEventModel priceEventModel);
 }

@@ -1,4 +1,4 @@
-package com.stockservice.domain;
+package com.stockservice.domain.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

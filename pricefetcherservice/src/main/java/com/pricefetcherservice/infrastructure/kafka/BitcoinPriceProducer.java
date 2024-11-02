@@ -1,14 +1,11 @@
 package com.pricefetcherservice.infrastructure.kafka;
 
-import com.pricefetcherservice.domain.PriceEvent;
+import com.pricefetcherservice.domain.models.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,12 +20,9 @@ public class BitcoinPriceProducer implements PriceProducer {
     }
 
     @Override
-    public void sendPrice(PriceEvent priceEvent) {
-        logger.info("Bitcoin Price Event => {}", priceEvent);
+    public void sendPrice(PriceEvent priceEvent) { // TODO: use protobuf instead of string
+        logger.info("Bitcoin Price Event => {}", priceEvent.toString());
 
-        Message<PriceEvent> message =
-            MessageBuilder.withPayload(priceEvent).setHeader(KafkaHeaders.TOPIC, bitcoinPriceTopic.name()).build();
-
-        kafkaTemplate.send(message);
+        kafkaTemplate.send(bitcoinPriceTopic.name(), priceEvent);
     }
 }

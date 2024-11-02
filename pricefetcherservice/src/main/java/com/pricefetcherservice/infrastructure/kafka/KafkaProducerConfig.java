@@ -1,6 +1,6 @@
 package com.pricefetcherservice.infrastructure.kafka;
 
-import com.pricefetcherservice.domain.PriceEvent;
+import com.pricefetcherservice.domain.models.PriceEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.pricefetcherservice.domain;
+package com.pricefetcherservice.domain.models;
 
 public enum StockSymbols {
     BTC_USD;

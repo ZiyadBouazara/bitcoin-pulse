@@ -1,11 +1,11 @@
-package com.pricefetcherservice.domain.service;
+package com.pricefetcherservice.domain.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pricefetcherservice.domain.PriceEvent;
+import com.pricefetcherservice.domain.models.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
 import com.pricefetcherservice.domain.PriceWebSocketClient;
-import com.pricefetcherservice.domain.StockSymbols;
+import com.pricefetcherservice.domain.models.StockSymbols;
 import com.pricefetcherservice.infrastructure.websocket.CoinbaseWebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
