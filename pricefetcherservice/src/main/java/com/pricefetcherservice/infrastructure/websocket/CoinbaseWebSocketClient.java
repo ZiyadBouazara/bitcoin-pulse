@@ -7,6 +7,7 @@ import com.pricefetcherservice.infrastructure.dtos.SubscribePriceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -56,7 +57,7 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         }
 
         @Override
-        public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        public void handleMessage(@NonNull WebSocketSession session, WebSocketMessage<?> message) {
             String payload = message.getPayload().toString();
             logger.info("Received message: " + payload);
             if (priceUpdateListener != null) {
@@ -65,12 +66,12 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         }
 
         @Override
-        public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) {
             logger.error("WebSocket transport error", exception);
         }
 
         @Override
-        public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+        public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) {
             logger.info("WebSocket connection closed: " + closeStatus);
         }
 
