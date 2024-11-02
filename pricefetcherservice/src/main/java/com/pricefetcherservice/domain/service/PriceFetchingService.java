@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pricefetcherservice.domain.PriceEvent;
 import com.pricefetcherservice.domain.PriceProducer;
+import com.pricefetcherservice.domain.PriceWebSocketClient;
 import com.pricefetcherservice.domain.StockSymbols;
 import com.pricefetcherservice.infrastructure.websocket.CoinbaseWebSocketClient;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class PriceFetchingService {
     private static final Logger logger = LoggerFactory.getLogger(PriceFetchingService.class);
     private static final List<StockSymbols> SUPPORTED_STOCKS = new ArrayList<>(List.of(StockSymbols.BTC_USD));
     private final PriceProducer bitcoinPriceProducer;
-    private final CoinbaseWebSocketClient coinbaseWebSocketClient; // TODO: add interface WebSocketClient for DIP
+    private final PriceWebSocketClient coinbaseWebSocketClient;
 
     public PriceFetchingService(PriceProducer bitcoinPriceProducer, CoinbaseWebSocketClient coinbaseWebSocketClient) {
         this.bitcoinPriceProducer = bitcoinPriceProducer;

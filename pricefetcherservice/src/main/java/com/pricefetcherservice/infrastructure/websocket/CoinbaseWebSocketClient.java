@@ -1,6 +1,8 @@
 package com.pricefetcherservice.infrastructure.websocket;
 
 
+import com.pricefetcherservice.domain.PriceUpdateListener;
+import com.pricefetcherservice.domain.PriceWebSocketClient;
 import com.pricefetcherservice.infrastructure.dtos.SubscribePriceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import java.util.List;
 
 @Component
-public class CoinbaseWebSocketClient {
+public class CoinbaseWebSocketClient implements PriceWebSocketClient {
     private static final Logger logger = LoggerFactory.getLogger(CoinbaseWebSocketClient.class);
     private static final List<String> CHANNELS = List.of("ticker_batch");
     private final String serverUri;
@@ -23,6 +25,7 @@ public class CoinbaseWebSocketClient {
         logger.info("WebSocket serverUri: " + this.serverUri);
     }
 
+    @Override
     public void connect(List<String> stocks) {
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
@@ -32,6 +35,7 @@ public class CoinbaseWebSocketClient {
         }
     }
 
+    @Override
     public void setPriceUpdateListener(PriceUpdateListener listener) {
         this.priceUpdateListener = listener;
     }
