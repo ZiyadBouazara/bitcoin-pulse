@@ -15,6 +15,7 @@ import java.util.List;
 @Setter
 public class SubscribePriceDTO {
     private static final Logger logger = LoggerFactory.getLogger(SubscribePriceDTO.class);
+    private static final String SUBSCRIBE_TYPE = "subscribe";
     @JsonProperty("type")
     private String type;
     @JsonProperty("channels")
@@ -22,9 +23,9 @@ public class SubscribePriceDTO {
     @JsonProperty("product_ids")
     private List<String> stocks;
 
-    public SubscribePriceDTO(List<String> stocks) {
-        this.type = "subscribe";
-        this.channels = List.of("ticker");
+    public SubscribePriceDTO(List<String> channels, List<String> stocks) {
+        this.type = SUBSCRIBE_TYPE;
+        this.channels = channels;
         this.stocks = stocks;
     }
 

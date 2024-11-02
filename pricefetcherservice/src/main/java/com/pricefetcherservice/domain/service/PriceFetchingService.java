@@ -20,19 +20,24 @@ import java.util.List;
 public class PriceFetchingService {
     private static final Logger logger = LoggerFactory.getLogger(PriceFetchingService.class);
     private static final List<StockSymbols> SUPPORTED_STOCKS = new ArrayList<>(List.of(StockSymbols.BTC_USD));
-    private PriceProducer bitcoinPriceProducer;
-    private CoinbaseWebSocketClient coinbaseWebSocketClient;
-
-    @Async
-    @EventListener(ApplicationReadyEvent.class)
-    public void startFetching() {
-        coinbaseWebSocketClient.connect(SUPPORTED_STOCKS.stream().map(StockSymbols::toString).toList());
-        coinbaseWebSocketClient.setPriceUpdateListener(this::handlePriceUpdate);
-    }
+    private final PriceProducer bitcoinPriceProducer;
+    private final CoinbaseWebSocketClient coinbaseWebSocketClient; // TODO: add interface WebSocketClient for DIP
 
     public PriceFetchingService(PriceProducer bitcoinPriceProducer, CoinbaseWebSocketClient coinbaseWebSocketClient) {
         this.bitcoinPriceProducer = bitcoinPriceProducer;
         this.coinbaseWebSocketClient = coinbaseWebSocketClient;
+    }
+
+    @Async
+    @EventListener(ApplicationReadyEvent.class)
+    public void startFetching() {
+        try {
+            logger.info("PriceFetchingService has started fetching bitcoin prices");
+            coinbaseWebSocketClient.setPriceUpdateListener(this::handlePriceUpdate);
+            coinbaseWebSocketClient.connect(SUPPORTED_STOCKS.stream().map(StockSymbols::toString).toList());
+        } catch (Exception e) {
+            logger.error("Exception in startFetching(): " + e.getMessage());
+        }
     }
 
     private void handlePriceUpdate(String priceUpdate) {
