@@ -48,8 +48,8 @@ Before setting up the Go Stock Service, ensure you have the following installed:
 1. **Clone the Repository:**
 
     ```bash
-    git clone https://github.com/ZiyadBouazara/stock-service-go.git
-    cd stock-service-go
+    git clone https://github.com/ZiyadBouazara/stockservice-go.git
+    cd stock-servicego
     ```
 
 2. **Install Dependencies:**
@@ -77,11 +77,11 @@ KAFKA_GROUP_ID=stockservice-go-consumer
     Two options: Either you run your own instances of Kafka and Zookeeper, OR you can use the `docker-compose.yaml` at the root fo the bitcoin pulse project that will run the images for you.
 
 
-2. **Build the service:**
+2. **Build and run the service:**
 
     ```bash
-   go build -o stockservice
+   make build
     ```
     ```bash
-   ./stockservice
+   make run
     ```
