@@ -1,7 +1,8 @@
 # Bitcoin Pulse
+![DALL·E 2024-11-03 11 01 04 - A cartoon-style logo for a project called 'Bitcoin Pulse', inspired by the simplicity of Go's gopher logo  The logo features a cute, simplified Bitcoi](https://github.com/user-attachments/assets/3f8ac386-b3e9-474e-bc75-a1aaeabf9672)
 
 
-Bitcoin Pulse is a real-time cryptocurrency tracker that fetches live Bitcoin prices using the Coinbase API 
+Bitcoin Pulse is a real-time cryptocurrency tracker that fetches live Bitcoin prices using the Coinbase Websocket Feed 
 and displays the data on an interactive graph. The application is built using a microservices architecture,
 leveraging Spring Boot, Kafka, and React to provide a scalable and efficient solution for real-time tracking.
 
