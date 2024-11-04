@@ -1,21 +1,31 @@
 package domain
 
+import (
+	"fmt"
+	"time"
+)
+
 type PriceEvent struct {
-	Type        string `json:"type"`
-	Sequence    int64  `json:"sequence"`
-	ProductID   string `json:"product_id"`
-	Price       string `json:"price"`
-	Open24H     string `json:"open_24h"`
-	Volume24H   string `json:"volume_24h"`
-	Low24H      string `json:"low_24h"`
-	High24H     string `json:"high_24h"`
-	Volume30D   string `json:"volume_30d"`
-	BestBid     string `json:"best_bid"`
-	BestBidSize string `json:"best_bid_size"`
-	BestAsk     string `json:"best_ask"`
-	BestAskSize string `json:"best_ask_size"`
-	Side        string `json:"side"`
-	Time        string `json:"time"`
-	TradeId     int64  `json:"trade_id"`
-	LastSize    string `json:"last_size"`
+	Type        string
+	Sequence    int64
+	ProductID   string
+	Price       float64
+	Open24H     float64
+	Volume24H   float64
+	Low24H      float64
+	High24H     float64
+	Volume30D   float64
+	BestBid     float64
+	BestBidSize float64
+	BestAsk     float64
+	BestAskSize float64
+	Side        string
+	Time        time.Time
+	TradeId     int64
+	LastSize    float64
+}
+
+func (event *PriceEvent) String() string {
+	return fmt.Sprintf("Type: %s, Sequence: %d, ProductID: %s, Price: %f, Open24H: %f, Volume24H: %f, Low24H: %f, High24H: %f, Volume30D: %f, BestBid: %f, BestBidSize: %f, BestAsk: %f, BestAskSize: %f, Side: %s, Time: %s, TradeId: %d, LastSize: %f",
+		event.Type, event.Sequence, event.ProductID, event.Price, event.Open24H, event.Volume24H, event.Low24H, event.High24H, event.Volume30D, event.BestBid, event.BestBidSize, event.BestAsk, event.BestAskSize, event.Side, event.Time, event.TradeId, event.LastSize)
 }
