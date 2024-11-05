@@ -21,7 +21,7 @@ public class BitcoinPriceProducer implements PriceProducer {
 
     @Override
     public void sendPrice(PriceEvent priceEvent) { // TODO: use protobuf instead of string
-        logger.info("Bitcoin Price Event => {}", priceEvent.toString());
+        logger.info("🚀 🚀 🚀 BTC Price Event sent 🚀 🚀 🚀 : \n{}", priceEvent.toString());
 
         kafkaTemplate.send(bitcoinPriceTopic.name(), priceEvent);
     }

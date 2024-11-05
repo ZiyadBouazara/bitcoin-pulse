@@ -59,7 +59,7 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         @Override
         public void handleMessage(@NonNull WebSocketSession session, WebSocketMessage<?> message) {
             String payload = message.getPayload().toString();
-            logger.info("Received message: " + payload);
+            logger.debug("📩 📩 📩 Received message from Coinbase Websocket 📩 📩 📩 : \n" + payload);
             if (priceUpdateListener != null) {
                 priceUpdateListener.onPriceUpdate(payload);
             }
