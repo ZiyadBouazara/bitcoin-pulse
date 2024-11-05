@@ -27,6 +27,45 @@ type PriceEventDTO struct {
 	LastSize    string `json:"last_size"`
 }
 
+func (e *PriceEventDTO) FormatLog() string {
+	return fmt.Sprintf(
+		"\nType: %s\n"+
+			"Sequence: %d\n"+
+			"ProductID: %s\n"+
+			"Price: %s\n"+
+			"Open24H: %s\n"+
+			"Volume24H: %s\n"+
+			"Low24H: %s\n"+
+			"High24H: %s\n"+
+			"Volume30D: %s\n"+
+			"BestBid: %s\n"+
+			"BestBidSize: %s\n"+
+			"BestAsk: %s\n"+
+			"BestAskSize: %s\n"+
+			"Side: %s\n"+
+			"Time: %s\n"+
+			"TradeID: %d\n"+
+			"LastSize: %s",
+		e.Type,
+		e.Sequence,
+		e.ProductID,
+		e.Price,
+		e.Open24H,
+		e.Volume24H,
+		e.Low24H,
+		e.High24H,
+		e.Volume30D,
+		e.BestBid,
+		e.BestBidSize,
+		e.BestAsk,
+		e.BestAskSize,
+		e.Side,
+		e.Time,
+		e.TradeId,
+		e.LastSize,
+	)
+}
+
 func ToPriceEvent(dto *PriceEventDTO) (*domain.PriceEvent, error) {
 	parseFloat := func(value string, fieldName string) (float64, error) {
 		f, err := strconv.ParseFloat(value, 64)

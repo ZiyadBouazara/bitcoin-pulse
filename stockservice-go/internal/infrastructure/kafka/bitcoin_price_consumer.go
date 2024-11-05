@@ -52,13 +52,15 @@ func (c *BitcoinPriceConsumer) Start(ctx context.Context) error {
 
 		c.logger.Debugf("Message received at offset %d: %s", msg.Offset, string(msg.Value))
 
-		var event dtos.PriceEventDTO
-		if err := json.Unmarshal(msg.Value, &event); err != nil {
+		var eventDTO dtos.PriceEventDTO
+		if err := json.Unmarshal(msg.Value, &eventDTO); err != nil {
 			c.logger.Errorf("Error unmarshalling message: %v", err)
 			continue
 		}
 
-		priceEvent, err := dtos.ToPriceEvent(&event)
+		c.logger.Infof("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
+
+		priceEvent, err := dtos.ToPriceEvent(&eventDTO)
 		if err != nil {
 			c.logger.Errorf("Error converting PriceEventDTO -> PriceEvent message: %v", err)
 			continue

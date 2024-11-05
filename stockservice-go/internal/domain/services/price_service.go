@@ -34,9 +34,5 @@ func (ps *PriceService) handlePriceEvent(event *domain.PriceEvent) error {
 	if event == nil {
 		return fmt.Errorf("received a nil PriceEvent")
 	}
-
-	ps.logger.Infof("🚀 🚀 🚀 Price Event received 🚀 🚀 🚀  %s", event.FormatLog())
-
 	return nil
-
 }
