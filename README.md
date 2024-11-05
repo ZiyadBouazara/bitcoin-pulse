@@ -6,10 +6,6 @@ Bitcoin Pulse is a real-time cryptocurrency tracker that fetches live Bitcoin pr
 and displays the data on an interactive graph. The application is built using a microservices architecture,
 leveraging Spring Boot, Kafka, and React to provide a scalable and efficient solution for real-time tracking.
 
-[![Java](https://img.shields.io/badge/java-17-blue)](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
-[![Spring Boot](https://img.shields.io/badge/spring--boot-3.3.3-brightgreen)](https://spring.io/projects/spring-boot)
-[![Spring Kafka](https://img.shields.io/badge/spring--kafka-3.2.4-brightgreen)](https://spring.io/projects/spring-kafka)
-[![Maven](https://img.shields.io/badge/maven-3.8.5-orange)](https://maven.apache.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -24,32 +20,15 @@ These instructions will get you a copy of the project up and running on your loc
 purposes.
 
 ### Installation
+A `docker-compose.yaml` is available to run Kafka and Zookeeper images, use the following commands if you see the need:
 
-Build the project:
-
-```bash
-mvn clean install
-```
-
-Run the project:
-
-```bash
-mvn spring-boot:run
-```
-
-Docker build image
-
-```bash
-docker build -t bitcoin-pulse .
-```
-
-Docker run image
+Docker run images
 
 ```bash
 docker compose up -d
 ```
 
-Docker stop image
+Docker stop images
 
 ```bash
 docker compose down -v
