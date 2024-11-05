@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -38,8 +38,8 @@ func main() {
 	go func() {
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, os.Interrupt, syscall.SIGTERM)
-		<-sigchan
-		logger.Info("Received shutdown signal")
+		sig := <-sigchan
+		logger.Infof("Received shutdown signal %v. Initiating shutdown... 👋", sig)
 		cancel()
 	}()
 

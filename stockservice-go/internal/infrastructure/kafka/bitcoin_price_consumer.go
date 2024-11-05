@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
 	"github.com/segmentio/kafka-go"
@@ -41,7 +42,7 @@ func (c *BitcoinPriceConsumer) Start(ctx context.Context) error {
 	for {
 		msg, err := c.reader.ReadMessage(ctx)
 		if err != nil {
-			if err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				c.logger.Info("BitcoinPriceConsumer context canceled")
 				return nil
 			}
@@ -49,7 +50,7 @@ func (c *BitcoinPriceConsumer) Start(ctx context.Context) error {
 			continue
 		}
 
-		c.logger.Infof("Message received at offset %d: %s", msg.Offset, string(msg.Value))
+		c.logger.Debugf("Message received at offset %d: %s", msg.Offset, string(msg.Value))
 
 		var event dtos.PriceEventDTO
 		if err := json.Unmarshal(msg.Value, &event); err != nil {
@@ -68,6 +69,6 @@ func (c *BitcoinPriceConsumer) Start(ctx context.Context) error {
 			continue
 		}
 
-		c.logger.Infof("Processed message at offset %d", msg.Offset)
+		c.logger.Debugf("Processed message at offset %d", msg.Offset)
 	}
 }
