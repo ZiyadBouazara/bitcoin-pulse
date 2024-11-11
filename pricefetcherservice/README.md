@@ -18,29 +18,26 @@
 
 ## Introduction
 
-The **Price Fetcher Service** is a robust and scalable Java-based application designed to fetch real-time price data from **Coinbase** using **Coinbase Websocket Feed**. 
-Leveraging the power of Spring Boot and Spring Kafka, this service ensures efficient data retrieval, processing, and distribution using Kafka Topics for loose coupling between microservices, and high-throughput data streams. 
-Whether you're building a trading platform, analytics dashboard, or any financial application requiring up-to-the-second price information, the Price Fetcher Service provides a reliable backbone to support your needs.
+The **Price Fetcher Service** is a robust and scalable Java-based application designed to fetch real-time price data
+from **Coinbase** using **Coinbase Websocket Feed**.
+Leveraging the power of Spring Boot and Spring Kafka, this service ensures efficient data retrieval, processing, and
+distribution using Kafka Topics for loose coupling between microservices, and high-throughput data streams.
+Whether you're building a trading platform, analytics dashboard, or any financial application requiring up-to-the-second
+price information, the Price Fetcher Service provides a reliable backbone to support your needs.
 
 ## Features
 
-**Real-Time Data Fetching**: Continuously retrieves price data from Coinbase Websocket feed.
-**Scalable Architecture**: Built with Spring Boot and Spring Kafka to handle high-throughput data streams.
-**Kafka Integration**: Seamlessly publishes fetched price data to Kafka topics for consumption by other services.
-**Configurable Endpoints**: Easily add or modify data sources through flexible configuration.
-**Monitoring&Logging**: Integrated with logging frameworks for real-time monitoring and troubleshooting.
-**Security**: Supports secure connections and authentication mechanisms for data sources and Kafka brokers.
-**Docker Support**: Containerized for easy deployment and scalability using Docker.
+* **Real-Time Data Fetching**: Continuously retrieves price data from Coinbase Websocket feed.
+* **Scalable Architecture**: Built with Spring Boot and Spring Kafka to handle high-throughput data streams.
+* **Kafka Integration**: Seamlessly publishes fetched price data to Kafka topics for consumption by other services.
+* **Configurable Endpoints**: Easily add or modify data sources through flexible configuration.
+* **Monitoring&Logging**: Integrated with logging frameworks for real-time monitoring and troubleshooting.
+* **Security**: Supports secure connections and authentication mechanisms for data sources and Kafka brokers.
+* **Docker Support**: Containerized for easy deployment and scalability using Docker.
 
 ## Architecture
 
-* domain/service/PriceFetchingService calls a WebsocketClient to retrieve the latest price of a given stock.
-
-* WebsocketClient makes an HTTP request to Coinbase API and returns the result as a Price object.
-
-* domain/service/PriceFetchingService creates a PriceEvent and calls the relevant PriceProducer.
-
-* PriceProducer (e.g., BitcoinPriceProducer) sends the PriceEvent to the relevant Kafka Topic (in this case bitcoin-price-topic).
+![Local Image](docs/architecture_price_fetcher_service.jpeg)
 
 ## Prerequisites
 
@@ -70,7 +67,7 @@ Before setting up the Price Fetcher Service, ensure that your environment meets 
 
 ## Configuration
 
-The Price Fetcher Service is highly configurable to accommodate different environments and requirements. 
+The Price Fetcher Service is highly configurable to accommodate different environments and requirements.
 Configuration is managed through the `application.properties` file located in the `src/main/resources/` directory.
 
 Here is an example that you can use:
@@ -89,8 +86,9 @@ coinbase.ws.url=wss://ws-feed.exchange.coinbase.com
 
 1. **Run Kafka and Zookeeper:**
 
-   Two options: Either you run your own instances of Kafka and Zookeeper, OR you can use the `docker-compose.yaml` at the root fo the Bitcoin Pulse project that will run the images for you.
+   Two options: Either you run your own instances of Kafka and Zookeeper, OR you can use the `docker-compose.yaml` at
+   the root fo the Bitcoin Pulse project that will run the images for you.
 
 
 2. **Build and run the service:**
-    You can either use Maven and CLI commands to run the project, OR use the `Dockerfile` to run an image of the service.
+   You can either use Maven and CLI commands to run the project, OR use the `Dockerfile` to run an image of the service.
