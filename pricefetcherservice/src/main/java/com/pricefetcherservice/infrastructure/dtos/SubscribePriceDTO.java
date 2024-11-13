@@ -50,12 +50,11 @@ public class SubscribePriceDTO {
         this.stocks = stocks;
     }
 
-    @Override
-    public String toString() {
+    public String toJson() {
         try {
             return new ObjectMapper().writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            logger.error("Error converting SubscribePriceDTO to JSON string", e);
+            logger.error("Error converting SubscribePriceDTO to Json", e);
             throw new RuntimeException(e);
         }
     }

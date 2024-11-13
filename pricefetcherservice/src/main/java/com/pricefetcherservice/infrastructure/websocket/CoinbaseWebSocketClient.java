@@ -51,7 +51,7 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         @Override
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             logger.info("WebSocket connection established");
-            String subscribeMessage = new SubscribePriceDTO(CHANNELS, stocks).toString();
+            String subscribeMessage = new SubscribePriceDTO(CHANNELS, stocks).toJson();
             session.sendMessage(new TextMessage(subscribeMessage));
             logger.info("Subscription message sent: " + subscribeMessage);
         }
