@@ -1,0 +1,9 @@
+<configuration>
+    <!-- Production Environment : ERROR/WARN-->
+    <!-- Development Environment : DEBUG/INFO-->
+
+    <!-- Disable all loggers-->
+    <root level="OFF">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
