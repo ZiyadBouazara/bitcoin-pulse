@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verify;
 class PriceFetchingServiceTest {
     private static final List<String> SUPPORTED_STOCKS = List.of("BTC-USD");
     private static final String AN_INVALID_JSON = "Invalid JSON";
-
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock

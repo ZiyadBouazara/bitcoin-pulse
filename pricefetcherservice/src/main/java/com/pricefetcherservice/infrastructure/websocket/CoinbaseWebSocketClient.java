@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class CoinbaseWebSocketClient implements PriceWebSocketClient {
     private static final Logger logger = LoggerFactory.getLogger(CoinbaseWebSocketClient.class);
-    private static final List<String> CHANNELS = List.of("ticker_batch");
+    public static final List<String> CHANNELS = List.of("ticker_batch");
     private final String serverUri;
     private PriceUpdateListener priceUpdateListener;
 
@@ -41,7 +41,7 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         this.priceUpdateListener = listener;
     }
 
-    private class CoinbaseWebSocketHandler implements WebSocketHandler {
+    protected class CoinbaseWebSocketHandler implements WebSocketHandler {
         private final List<String> stocks;
 
         public CoinbaseWebSocketHandler(List<String> stocks) {
