@@ -1,0 +1,68 @@
+version: 2.1
+
+executors:
+  maven-executor:
+    docker:
+      - image: maven:3.9.4-eclipse-temurin-21
+    working_directory: ~/repo
+    resource_class: small
+    environment:
+      _JAVA_OPTIONS: "-Xmx2g -XX:+UseG1GC"
+
+jobs:
+  build:
+    executor: maven-executor
+    steps:
+      - run:
+          name: Skip job if not a PR
+          command: |
+            if [ -z "${CIRCLE_PULL_REQUEST}" ]; then
+              circleci-agent step halt
+            fi
+      - checkout
+      - restore_cache:
+          key: v1-maven-{{ checksum "pom.xml" }}
+      - run:
+          name: Install dependencies
+          command: mvn dependency:resolve
+          timeout: 2m
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-maven-{{ checksum "pom.xml" }}
+      - run:
+          name: Compile Project
+          command: mvn compile
+          timeout: 1m
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
+
+  test:
+    executor: maven-executor
+    steps:
+      - run:
+          name: Skip job if not a PR
+          command: |
+            if [ -z "${CIRCLE_PULL_REQUEST}" ]; then
+              circleci-agent step halt
+            fi
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: v1-maven-{{ checksum "pom.xml" }}
+      - run:
+          name: Run Unit Tests
+          command: mvn test
+          timeout: 1m
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
