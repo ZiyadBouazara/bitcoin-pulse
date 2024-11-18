@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain/ports"
-	"github.com/sirupsen/logrus"
 )
 
 type PriceService struct {
 	consumer ports.Consumer
-	logger   *logrus.Logger
+	logger   ports.Logger
 }
 
-func NewPriceService(consumer ports.Consumer, logger *logrus.Logger) *PriceService {
+func NewPriceService(consumer ports.Consumer, logger ports.Logger) *PriceService {
 	return &PriceService{
 		consumer: consumer,
 		logger:   logger,

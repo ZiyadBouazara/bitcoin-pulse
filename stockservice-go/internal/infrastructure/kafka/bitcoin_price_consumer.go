@@ -5,18 +5,18 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain/ports"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
 	"github.com/segmentio/kafka-go"
-	"github.com/sirupsen/logrus"
 )
 
 type BitcoinPriceConsumer struct {
 	reader  *kafka.Reader
 	handler func(event *domain.PriceEvent) error
-	logger  *logrus.Logger
+	logger  ports.Logger
 }
 
-func NewBitcoinPriceConsumer(brokerURL, topic, groupID string, logger *logrus.Logger) *BitcoinPriceConsumer {
+func NewBitcoinPriceConsumer(brokerURL, topic, groupID string, logger ports.Logger) *BitcoinPriceConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{brokerURL},
 		GroupID: groupID,
