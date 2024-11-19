@@ -4,23 +4,23 @@ import (
 	"context"
 	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
+	mocks2 "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"testing"
 )
 
-func setup(t *testing.T) (*gomock.Controller, *mocks.MockConsumer, *mocks.MockLogger, *PriceService) {
+func setup(t *testing.T) (*gomock.Controller, *mocks2.MockConsumer, *PriceService) {
 	ctrl := gomock.NewController(t)
-	mockConsumer := mocks.NewMockConsumer(ctrl)
-	mockLogger := mocks.NewMockLogger(ctrl)
-	service := NewPriceService(mockConsumer, mockLogger)
+	mockConsumer := mocks2.NewMockConsumer(ctrl)
+	stubLogger := &mocks2.StubLogger{}
+	service := NewPriceService(mockConsumer, stubLogger)
 
-	return ctrl, mockConsumer, mockLogger, service
+	return ctrl, mockConsumer, service
 }
 
 func TestPriceService_StartConsuming_WithError(t *testing.T) {
-	ctrl, mockConsumer, mockLogger, priceService := setup(t)
+	ctrl, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
@@ -28,26 +28,24 @@ func TestPriceService_StartConsuming_WithError(t *testing.T) {
 
 	mockConsumer.EXPECT().SetListener(gomock.Any())
 	mockConsumer.EXPECT().Start(ctx).Return(startErr)
-	mockLogger.EXPECT().Errorf("BitcoinPriceConsumer exited with error: %v", startErr)
 
 	priceService.StartConsuming(ctx)
 }
 
 func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
-	ctrl, mockConsumer, mockLogger, priceService := setup(t)
+	ctrl, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
 
 	mockConsumer.EXPECT().SetListener(gomock.Any())
 	mockConsumer.EXPECT().Start(ctx).Return(nil)
-	mockLogger.EXPECT().Info("BitcoinPriceConsumer exited")
 
 	priceService.StartConsuming(ctx)
 }
 
 func TestPriceService_handlePriceEvent_WithNilEvent(t *testing.T) {
-	ctrl, _, _, priceService := setup(t)
+	ctrl, _, priceService := setup(t)
 	defer ctrl.Finish()
 
 	err := priceService.handlePriceEvent(nil)
@@ -57,7 +55,7 @@ func TestPriceService_handlePriceEvent_WithNilEvent(t *testing.T) {
 }
 
 func TestPriceService_handlePriceEvent_WithValidEvent(t *testing.T) {
-	ctrl, _, _, priceService := setup(t)
+	ctrl, _, priceService := setup(t)
 	defer ctrl.Finish()
 
 	priceEvent := &domain.PriceEvent{

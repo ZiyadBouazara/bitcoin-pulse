@@ -50,27 +50,34 @@ func (c *BitcoinPriceConsumer) Start(ctx context.Context) error {
 			continue
 		}
 
-		c.logger.Debugf("Message received at offset %d: %s", msg.Offset, string(msg.Value))
-
-		var eventDTO dtos.PriceEventDTO
-		if err := json.Unmarshal(msg.Value, &eventDTO); err != nil {
-			c.logger.Errorf("Error unmarshalling message: %v", err)
+		if err := c.ProcessMessage(msg); err != nil {
 			continue
 		}
-
-		c.logger.Infof("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
-
-		priceEvent, err := dtos.ToPriceEvent(&eventDTO)
-		if err != nil {
-			c.logger.Errorf("Error converting PriceEventDTO -> PriceEvent message: %v", err)
-			continue
-		}
-
-		if err := c.handler(priceEvent); err != nil {
-			c.logger.Errorf("Error handling message: %v", err)
-			continue
-		}
-
-		c.logger.Debugf("Processed message at offset %d", msg.Offset)
 	}
+}
+
+func (c *BitcoinPriceConsumer) ProcessMessage(msg kafka.Message) error {
+	c.logger.Debugf("Message received at offset %d: %s", msg.Offset, string(msg.Value))
+
+	var eventDTO dtos.PriceEventDTO
+	if err := json.Unmarshal(msg.Value, &eventDTO); err != nil {
+		c.logger.Errorf("Error unmarshalling message: %v", err)
+		return err
+	}
+
+	c.logger.Infof("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
+
+	priceEvent, err := dtos.ToPriceEvent(&eventDTO)
+	if err != nil {
+		c.logger.Errorf("Error converting PriceEventDTO -> PriceEvent message: %v", err)
+		return err
+	}
+
+	if err := c.handler(priceEvent); err != nil {
+		c.logger.Errorf("Error handling message: %v", err)
+		return err
+	}
+
+	c.logger.Debugf("Processed message at offset %d", msg.Offset)
+	return nil
 }
