@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain/ports"
 	"github.com/sirupsen/logrus"
 	"os"
 )
@@ -10,7 +9,7 @@ type LogrusLogger struct {
 	*logrus.Logger
 }
 
-func NewLogger() ports.Logger {
+func NewLogger() *LogrusLogger {
 	logger := logrus.New()
 
 	logger.SetOutput(os.Stdout)
@@ -21,5 +20,3 @@ func NewLogger() ports.Logger {
 
 	return &LogrusLogger{logger}
 }
-
-//var _ ports.Logger = (*LogrusLogger)(nil)

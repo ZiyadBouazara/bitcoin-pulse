@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain/ports"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
 	"github.com/segmentio/kafka-go"
 )
 
 type BitcoinPriceConsumer struct {
 	reader  *kafka.Reader
-	handler func(event *domain.PriceEvent) error
+	handler func(event *models.PriceEvent) error
 	logger  ports.Logger
 }
 
@@ -29,7 +29,7 @@ func NewBitcoinPriceConsumer(brokerURL, topic, groupID string, logger ports.Logg
 	}
 }
 
-func (c *BitcoinPriceConsumer) SetListener(handlePriceEvent func(event *domain.PriceEvent) error) {
+func (c *BitcoinPriceConsumer) SetListener(handlePriceEvent func(event *models.PriceEvent) error) {
 	c.handler = handlePriceEvent
 }
 

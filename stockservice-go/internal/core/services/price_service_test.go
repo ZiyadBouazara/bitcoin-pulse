@@ -3,24 +3,25 @@ package services
 import (
 	"context"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	mocks2 "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"testing"
 )
 
-func setup(t *testing.T) (*gomock.Controller, *mocks2.MockConsumer, *PriceService) {
+func setup(t *testing.T) (*gomock.Controller, *mocks.MockServer, *mocks.MockConsumer, *PriceService) {
 	ctrl := gomock.NewController(t)
-	mockConsumer := mocks2.NewMockConsumer(ctrl)
-	stubLogger := &mocks2.StubLogger{}
-	service := NewPriceService(mockConsumer, stubLogger)
+	mockServer := mocks.NewMockServer(ctrl)
+	mockConsumer := mocks.NewMockConsumer(ctrl)
+	stubLogger := &mocks.StubLogger{}
+	service := NewPriceService(mockServer, mockConsumer, stubLogger)
 
-	return ctrl, mockConsumer, service
+	return ctrl, mockServer, mockConsumer, service
 }
 
 func TestPriceService_StartConsuming_WithError(t *testing.T) {
-	ctrl, mockConsumer, priceService := setup(t)
+	ctrl, _, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
@@ -33,7 +34,7 @@ func TestPriceService_StartConsuming_WithError(t *testing.T) {
 }
 
 func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
-	ctrl, mockConsumer, priceService := setup(t)
+	ctrl, _, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
@@ -45,7 +46,7 @@ func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
 }
 
 func TestPriceService_handlePriceEvent_WithNilEvent(t *testing.T) {
-	ctrl, _, priceService := setup(t)
+	ctrl, _, _, priceService := setup(t)
 	defer ctrl.Finish()
 
 	err := priceService.handlePriceEvent(nil)
@@ -55,12 +56,13 @@ func TestPriceService_handlePriceEvent_WithNilEvent(t *testing.T) {
 }
 
 func TestPriceService_handlePriceEvent_WithValidEvent(t *testing.T) {
-	ctrl, _, priceService := setup(t)
+	ctrl, mockService, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	priceEvent := &domain.PriceEvent{
+	priceEvent := &models.PriceEvent{
 		Price: 100000.0,
 	}
+	mockService.EXPECT().BroadcastPriceEvent(priceEvent)
 
 	err := priceService.handlePriceEvent(priceEvent)
 

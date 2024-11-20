@@ -19,7 +19,8 @@ func TestToPriceEvent_Success(t *testing.T) {
 
 func TestToPriceEvent_ErrorParsingFloat(t *testing.T) {
 	dto := &dtos.PriceEventDTO{
-		Price: "invalid",
+		ProductID: "BTC-USD",
+		Price:     "invalid",
 	}
 
 	event, err := dtos.ToPriceEvent(dto)
