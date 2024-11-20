@@ -71,7 +71,7 @@ func initRoutes(server *domain.Server, logger ports.Logger) {
 		},
 	}
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/ws/livepricesfeed", func(w http.ResponseWriter, r *http.Request) {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			logger.Errorf("Failed to upgrade to WebSocket: %v", err)
