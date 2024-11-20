@@ -11,6 +11,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 6
 
     steps:
       - name: Checkout code
@@ -25,21 +26,24 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml', '**/settings.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Navigate to Service Directory
-        working-directory: pricefetcherservice
-        run: pwd
+      - name: Navigate to pricefetcherservice directory
+        run: cd pricefetcherservice
 
-      - name: Compile
-        run: mvn clean compile
+      - name: Compile Project
+        run: mvn compile
+        working-directory: pricefetcherservice
+        timeout-minutes: 2
+
+      - name: Build Project
+        run: mvn clean install
+        working-directory: pricefetcherservice
+        timeout-minutes: 2
 
       - name: Run Tests
         run: mvn test
-
-      #- name: Run Checkstyle
-        #run: mvn checkstyle:check
-
-        
+        working-directory: pricefetcherservice
+        timeout-minutes: 2
