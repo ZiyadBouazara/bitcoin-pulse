@@ -81,4 +81,3 @@ public class CoinbaseWebSocketClient implements PriceWebSocketClient {
         }
     }
 }
-
