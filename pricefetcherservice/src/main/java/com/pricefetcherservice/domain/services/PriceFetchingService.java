@@ -17,7 +17,6 @@ import java.util.List;
 
 @Service
 public class PriceFetchingService {
-    //PriceFetchingService
     private static final Logger logger = LoggerFactory.getLogger(PriceFetchingService.class);
     private static final List<StockSymbols> SUPPORTED_STOCKS = new ArrayList<>(List.of(StockSymbols.BTC_USD));
     private final PriceProducer bitcoinPriceProducer;
