@@ -9,9 +9,10 @@ on:
       - 'pricefetcherservice/**'
 
 jobs:
-  build-and-test:
+  setup:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    outputs:
+      maven-cache: ${{ steps.cache-maven.outputs.cache-hit }}
 
     steps:
       - name: Checkout code
@@ -24,6 +25,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Cache Maven Repository
+        id: cache-maven
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
@@ -31,20 +33,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+  compile:
+    runs-on: ubuntu-latest
+    needs: setup
+    timeout-minutes: 3
+    steps:
       - name: Navigate to pricefetcherservice directory
         run: cd pricefetcherservice
 
       - name: Compile Project
         run: mvn compile
         working-directory: pricefetcherservice
-        timeout-minutes: 2
 
+  build:
+    runs-on: ubuntu-latest
+    needs: compile
+    timeout-minutes: 3
+    steps:
       - name: Build Project
         run: mvn clean install
         working-directory: pricefetcherservice
-        timeout-minutes: 2
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 3
+    steps:
       - name: Run Tests
         run: mvn test
         working-directory: pricefetcherservice
-        timeout-minutes: 2
