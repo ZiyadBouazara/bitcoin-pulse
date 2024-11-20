@@ -22,6 +22,8 @@ public class PriceFetchingService {
     private final PriceProducer bitcoinPriceProducer;
     private final PriceWebSocketClient priceWebSocketClient;
 
+    //This is a test for ci and can be removed
+
     public PriceFetchingService(PriceProducer bitcoinPriceProducer, PriceWebSocketClient priceWebSocketClient) {
         this.bitcoinPriceProducer = bitcoinPriceProducer;
         this.priceWebSocketClient = priceWebSocketClient;
