@@ -43,6 +43,6 @@ func main() {
 		cancel()
 	}()
 
-	// Start consuming the service
+	// Start consuming
 	priceService.StartConsuming(ctx)
 }
