@@ -12,6 +12,8 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <spring.boot.version>3.3.1</spring.boot.version>
         <spring.kafka.version>3.2.4</spring.kafka.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
