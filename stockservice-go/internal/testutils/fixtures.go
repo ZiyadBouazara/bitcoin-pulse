@@ -1,15 +1,15 @@
 package testutils
 
 import (
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"time"
 )
 
-func CreateValidPriceEvent() *models.PriceEvent {
+func CreateValidPriceEvent() *domain.PriceEvent {
 	expectedTime, _ := time.Parse(time.RFC3339, "2023-11-18T12:34:56Z")
 
-	return &models.PriceEvent{
+	return &domain.PriceEvent{
 		Type:        "ticker",
 		Sequence:    100,
 		ProductID:   "BTC-USD",

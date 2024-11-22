@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
 	"github.com/segmentio/kafka-go"
 )
 
 type BitcoinPriceConsumer struct {
 	reader  *kafka.Reader
-	handler func(event *models.PriceEvent) error
+	handler func(event *domain.PriceEvent) error
 	logger  ports.Logger
 }
 
@@ -29,7 +29,7 @@ func NewBitcoinPriceConsumer(brokerURL, topic, groupID string, logger ports.Logg
 	}
 }
 
-func (c *BitcoinPriceConsumer) SetListener(handlePriceEvent func(event *models.PriceEvent) error) {
+func (c *BitcoinPriceConsumer) SetListener(handlePriceEvent func(event *domain.PriceEvent) error) {
 	c.handler = handlePriceEvent
 }
 
@@ -65,7 +65,7 @@ func (c *BitcoinPriceConsumer) ProcessMessage(msg kafka.Message) error {
 		return err
 	}
 
-	c.logger.Infof("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
+	c.logger.Debugf("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
 
 	priceEvent, err := dtos.ToPriceEvent(&eventDTO)
 	if err != nil {

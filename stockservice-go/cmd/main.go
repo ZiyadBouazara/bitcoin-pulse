@@ -4,35 +4,45 @@ import (
 	"context"
 	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/config"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/handlers"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/kafka"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/logging"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/notifier"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/services"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/kafka"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/logging"
-	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	cfg := loadConfig()
-	logger := logging.NewLogger()
-	server := domain.NewServer(logger)
-	priceService := initKafkaConsumer(cfg, server, logger)
+var (
+	cfg               *config.Config
+	router            *gin.Engine
+	logger            *logging.LogrusLogger
+	priceService      *services.PriceService
+	livePricesHandler *handlers.LivePricesHandler
+	notif             *notifier.Notifier
+)
 
-	initRoutes(server, logger)
+func main() {
+	cfg = loadConfig()
+	logger = logging.NewLogger()
+	notif = notifier.NewNotifier(logger)
+
+	priceService = initKafkaConsumer()
+
+	router = initRoutes()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	srv := startHTTPServer(cfg.Port, logger)
+	srv := startHTTPServer()
 
-	go handleShutdown(cancel, logger, srv)
+	go handleShutdown(cancel, srv)
 
 	priceService.StartConsuming(ctx)
 }
@@ -63,48 +73,41 @@ func loadConfig() *config.Config {
 	}
 }
 
-func initRoutes(server *domain.Server, logger ports.Logger) {
-	upgrader := websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			// TODO: Secure this in production by checking the Origin header
-			return true
-		},
-	}
+func initRoutes() *gin.Engine {
+	router := gin.Default()
 
-	http.HandleFunc("/ws/livepricesfeed", func(w http.ResponseWriter, r *http.Request) {
-		ws, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			logger.Errorf("Failed to upgrade to WebSocket: %v", err)
-			return
-		}
+	livePricesHandler = handlers.NewLivePricesHandler(priceService, logger)
+	router.GET("/ws/livepricesfeed", livePricesHandler.HandleWebSocket)
 
-		go server.HandleWS(ws)
-	})
+	return router
 }
 
-func initKafkaConsumer(config *config.Config, server ports.Server, logger ports.Logger) *services.PriceService {
+func initKafkaConsumer() *services.PriceService {
 	bitcoinPriceConsumer := kafka.NewBitcoinPriceConsumer(
-		config.KafkaBrokerURL,
-		config.KafkaTopic,
-		config.KafkaGroupID,
+		cfg.KafkaBrokerURL,
+		cfg.KafkaTopic,
+		cfg.KafkaGroupID,
 		logger,
 	)
-	priceService := services.NewPriceService(server, bitcoinPriceConsumer, logger)
+	priceService = services.NewPriceService(notif, bitcoinPriceConsumer, logger)
 	return priceService
 }
 
-func startHTTPServer(port string, logger ports.Logger) *http.Server {
-	srv := &http.Server{Addr: port}
+func startHTTPServer() *http.Server {
+	srv := &http.Server{
+		Addr:    cfg.Port,
+		Handler: router,
+	}
 	go func() {
-		logger.Infof("Server started on %v", port)
+		logger.Infof("Server started on %v", cfg.Port)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf("Server failed: %v", err)
+			logger.Fatalf("Server failed: %v", err)
 		}
 	}()
 	return srv
 }
 
-func handleShutdown(cancel context.CancelFunc, logger ports.Logger, srv *http.Server) {
+func handleShutdown(cancel context.CancelFunc, srv *http.Server) {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, os.Interrupt, syscall.SIGTERM)
 	sig := <-sigchan

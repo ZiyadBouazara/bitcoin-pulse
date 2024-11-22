@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -59,7 +59,7 @@ func TestPriceService_handlePriceEvent_WithValidEvent(t *testing.T) {
 	ctrl, mockService, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	priceEvent := &models.PriceEvent{
+	priceEvent := &domain.PriceEvent{
 		Price: 100000.0,
 	}
 	mockService.EXPECT().BroadcastPriceEvent(priceEvent)

@@ -2,8 +2,17 @@ package ports
 
 import (
 	"context"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
+	"github.com/gorilla/websocket"
 )
+
+type PriceService interface {
+	StartConsuming(ctx context.Context)
+	AddClient(ws *websocket.Conn)
+	RemoveClient(ws *websocket.Conn)
+	Subscribe(ws *websocket.Conn, stock domain.Stock) error
+	Unsubscribe(ws *websocket.Conn, stock domain.Stock) error
+}
 
 type Logger interface {
 	Errorf(format string, args ...interface{})
@@ -14,14 +23,18 @@ type Logger interface {
 
 type Consumer interface {
 	Start(ctx context.Context) error
-	SetListener(handlePriceEvent func(event *models.PriceEvent) error,
+	SetListener(handlePriceEvent func(event *domain.PriceEvent) error,
 	)
 }
 
 type PriceEventListener interface {
-	OnPriceEvent(event *models.PriceEvent) error
+	OnPriceEvent(event *domain.PriceEvent) error
 }
 
-type Server interface {
-	BroadcastPriceEvent(event *models.PriceEvent)
+type Notifier interface {
+	Broadcast(event *domain.PriceEvent) error
+	AddClient(ws *websocket.Conn)
+	RemoveClient(ws *websocket.Conn)
+	Subscribe(ws *websocket.Conn, stock domain.Stock) error
+	Unsubscribe(ws *websocket.Conn, stock domain.Stock) error
 }

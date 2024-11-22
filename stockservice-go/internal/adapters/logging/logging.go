@@ -18,5 +18,7 @@ func NewLogger() *LogrusLogger {
 		FullTimestamp: true,
 	})
 
+	logger.SetLevel(logrus.InfoLevel)
+
 	return &LogrusLogger{logger}
 }

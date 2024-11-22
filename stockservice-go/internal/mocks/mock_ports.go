@@ -11,9 +11,9 @@ package mocks
 
 import (
 	context "context"
+	models "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	reflect "reflect"
 
-	models "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
 	gomock "go.uber.org/mock/gomock"
 )
 

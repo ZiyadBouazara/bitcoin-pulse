@@ -1,7 +1,7 @@
 package dtos_test
 
 import (
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"testing"

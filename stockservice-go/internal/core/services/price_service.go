@@ -2,27 +2,27 @@ package services
 
 import (
 	"context"
-	"fmt"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/models"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
+	"github.com/gorilla/websocket"
 )
 
 type PriceService struct {
-	server   ports.Server
+	notifier ports.Notifier
 	consumer ports.Consumer
 	logger   ports.Logger
 }
 
-func NewPriceService(server ports.Server, consumer ports.Consumer, logger ports.Logger) *PriceService {
+func NewPriceService(notifier ports.Notifier, consumer ports.Consumer, logger ports.Logger) *PriceService {
 	return &PriceService{
-		server:   server,
+		notifier: notifier,
 		consumer: consumer,
 		logger:   logger,
 	}
 }
 
 func (ps *PriceService) StartConsuming(ctx context.Context) {
-	ps.consumer.SetListener(ps.handlePriceEvent)
+	ps.consumer.SetListener(ps.notifier.Broadcast)
 
 	if err := ps.consumer.Start(ctx); err != nil {
 		ps.logger.Errorf("BitcoinPriceConsumer exited with error: %v", err)
@@ -31,10 +31,26 @@ func (ps *PriceService) StartConsuming(ctx context.Context) {
 	}
 }
 
-func (ps *PriceService) handlePriceEvent(event *models.PriceEvent) error {
-	if event == nil {
-		return fmt.Errorf("received a nil PriceEvent")
+func (ps *PriceService) AddClient(ws *websocket.Conn) {
+	ps.notifier.AddClient(ws)
+}
+
+func (ps *PriceService) RemoveClient(ws *websocket.Conn) {
+	ps.notifier.RemoveClient(ws)
+}
+
+func (ps *PriceService) Subscribe(ws *websocket.Conn, stock domain.Stock) error {
+	err := ps.notifier.Subscribe(ws, stock)
+	if err != nil {
+		ps.logger.Errorf("error subscribing Client: %v", ws.RemoteAddr())
 	}
-	ps.server.BroadcastPriceEvent(event)
+	return nil
+}
+
+func (ps *PriceService) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error {
+	err := ps.notifier.Unsubscribe(ws, stock)
+	if err != nil {
+		ps.logger.Errorf("error unsubscribing Client: %v", ws.RemoteAddr())
+	}
 	return nil
 }
