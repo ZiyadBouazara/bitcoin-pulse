@@ -5,19 +5,20 @@ import (
 	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
+	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"testing"
 )
 
-func setup(t *testing.T) (*gomock.Controller, *mocks.MockServer, *mocks.MockConsumer, *PriceService) {
+func setup(t *testing.T) (*gomock.Controller, *mocks.MockNotifier, *mocks.MockConsumer, *PriceService) {
 	ctrl := gomock.NewController(t)
-	mockServer := mocks.NewMockServer(ctrl)
+	mockNotifier := mocks.NewMockNotifier(ctrl)
 	mockConsumer := mocks.NewMockConsumer(ctrl)
 	stubLogger := &mocks.StubLogger{}
-	service := NewPriceService(mockServer, mockConsumer, stubLogger)
+	service := NewPriceService(mockNotifier, mockConsumer, stubLogger)
 
-	return ctrl, mockServer, mockConsumer, service
+	return ctrl, mockNotifier, mockConsumer, service
 }
 
 func TestPriceService_StartConsuming_WithError(t *testing.T) {
@@ -45,26 +46,46 @@ func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
 	priceService.StartConsuming(ctx)
 }
 
-func TestPriceService_handlePriceEvent_WithNilEvent(t *testing.T) {
-	ctrl, _, _, priceService := setup(t)
+func TestPriceService_AddClient(t *testing.T) {
+	ctrl, mockNotifier, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	err := priceService.handlePriceEvent(nil)
+	ws := &websocket.Conn{}
+	mockNotifier.EXPECT().AddClient(ws)
 
-	assert.Error(t, err)
-	assert.Equal(t, "received a nil PriceEvent", err.Error())
+	priceService.AddClient(ws)
 }
 
-func TestPriceService_handlePriceEvent_WithValidEvent(t *testing.T) {
-	ctrl, mockService, _, priceService := setup(t)
+func TestPriceService_RemoveClient(t *testing.T) {
+	ctrl, mockNotifier, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	priceEvent := &domain.PriceEvent{
-		Price: 100000.0,
-	}
-	mockService.EXPECT().BroadcastPriceEvent(priceEvent)
+	ws := &websocket.Conn{}
+	mockNotifier.EXPECT().RemoveClient(ws)
 
-	err := priceService.handlePriceEvent(priceEvent)
+	priceService.RemoveClient(ws)
+}
 
+func TestPriceService_Subscribe(t *testing.T) {
+	ctrl, mockNotifier, _, priceService := setup(t)
+	defer ctrl.Finish()
+
+	ws := &websocket.Conn{}
+	stock := domain.Stock("BTC-USD")
+	mockNotifier.EXPECT().Subscribe(ws, stock).Return(nil)
+
+	err := priceService.Subscribe(ws, stock)
+	assert.NoError(t, err)
+}
+
+func TestPriceService_Unsubscribe(t *testing.T) {
+	ctrl, mockNotifier, _, priceService := setup(t)
+	defer ctrl.Finish()
+
+	ws := &websocket.Conn{}
+	stock := domain.Stock("BTC-USD")
+	mockNotifier.EXPECT().Unsubscribe(ws, stock).Return(nil)
+
+	err := priceService.Unsubscribe(ws, stock)
 	assert.NoError(t, err)
 }
