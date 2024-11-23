@@ -10,42 +10,47 @@ import (
 )
 
 type Notifier struct {
-	conns         map[*websocket.Conn]bool
-	subscriptions map[domain.Stock]map[*websocket.Conn]bool
+	conns         sync.Map // key: ports.WebSocketConn, value: struct{}
+	subscriptions sync.Map // key: domain.Stock, value: *sync.Map (key: ports.WebSocketConn, value: struct{})
 	logger        ports.Logger
-	mu            sync.Mutex
 }
 
 func NewNotifier(logger ports.Logger) *Notifier {
 	return &Notifier{
-		conns:         make(map[*websocket.Conn]bool),
-		subscriptions: make(map[domain.Stock]map[*websocket.Conn]bool),
-		logger:        logger,
-		mu:            sync.Mutex{},
+		logger: logger,
 	}
 }
 
-func (n *Notifier) AddClient(ws *websocket.Conn) {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-
-	n.conns[ws] = true
+func (n *Notifier) AddClient(ws ports.WebSocketConn) {
+	n.conns.Store(ws, struct{}{})
 }
 
-func (n *Notifier) RemoveClient(ws *websocket.Conn) {
-	n.mu.Lock()
-	defer n.mu.Unlock()
+func (n *Notifier) RemoveClient(ws ports.WebSocketConn) {
+	n.conns.Delete(ws)
 
-	delete(n.conns, ws)
+	n.subscriptions.Range(func(key, value interface{}) bool {
+		clients := value.(*sync.Map)
+		clients.Delete(ws)
+		return true
+	})
+}
 
-	for stock, clients := range n.subscriptions {
-		if clients[ws] {
-			delete(clients, ws)
-			if len(clients) == 0 {
-				delete(n.subscriptions, stock)
-			}
-		}
+func (n *Notifier) Subscribe(ws ports.WebSocketConn, stock domain.Stock) error {
+	clientsInterface, _ := n.subscriptions.LoadOrStore(stock, &sync.Map{})
+	clients := clientsInterface.(*sync.Map)
+	clients.Store(ws, struct{}{})
+	n.logger.Infof("Client %v subscribed to %v", ws.RemoteAddr(), stock)
+	return nil
+}
+
+func (n *Notifier) Unsubscribe(ws ports.WebSocketConn, stock domain.Stock) error {
+	clientsInterface, ok := n.subscriptions.Load(stock)
+	if ok {
+		clients := clientsInterface.(*sync.Map)
+		clients.Delete(ws)
+		n.logger.Infof("Client %v unsubscribed from %v", ws.RemoteAddr(), stock)
 	}
+	return nil
 }
 
 func (n *Notifier) Broadcast(event *domain.PriceEvent) error {
@@ -53,58 +58,56 @@ func (n *Notifier) Broadcast(event *domain.PriceEvent) error {
 		return fmt.Errorf("received a nil PriceEvent")
 	}
 
-	n.mu.Lock()
-	clients := n.subscriptions[event.ProductID]
-	defer n.mu.Unlock()
-
-	if clients == nil {
+	clientsInterface, ok := n.subscriptions.Load(event.ProductID)
+	if !ok {
 		return nil
 	}
 
+	clients := clientsInterface.(*sync.Map)
 	msg, err := json.Marshal(event)
 	if err != nil {
 		n.logger.Errorf("Error marshalling price event: %v", err)
 		return nil
 	}
 
-	for ws := range clients {
-		err := ws.WriteMessage(websocket.TextMessage, msg)
-		if err != nil {
+	clients.Range(func(key, _ interface{}) bool {
+		ws := key.(ports.WebSocketConn)
+		if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 			n.logger.Errorf("Error sending message to client %v: %v", ws.RemoteAddr(), err)
-			n.RemoveClient(ws)
+			clients.Delete(ws)
+			n.conns.Delete(ws)
 			if err := ws.Close(); err != nil {
-				return nil
+				n.logger.Errorf("Error closing WebSocket: %v", err)
 			}
 		}
-	}
+		return true
+	})
 
 	return nil
 }
 
-func (n *Notifier) Subscribe(ws *websocket.Conn, stock domain.Stock) error {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-
-	if n.subscriptions[stock] == nil {
-		n.subscriptions[stock] = make(map[*websocket.Conn]bool)
-	}
-	n.subscriptions[stock][ws] = true
-	n.logger.Infof("Client %v subscribed to %v", ws.RemoteAddr(), stock)
-
-	return nil
+func (n *Notifier) GetConnections() map[ports.WebSocketConn]struct{} {
+	connsCopy := make(map[ports.WebSocketConn]struct{})
+	n.conns.Range(func(key, value interface{}) bool {
+		ws := key.(ports.WebSocketConn)
+		connsCopy[ws] = struct{}{}
+		return true
+	})
+	return connsCopy
 }
 
-func (n *Notifier) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-
-	if clients, ok := n.subscriptions[stock]; ok {
-		delete(clients, ws)
-		if len(clients) == 0 {
-			delete(n.subscriptions, stock)
-		}
-		n.logger.Infof("Client %v unsubscribed from %v", ws.RemoteAddr(), stock)
+func (n *Notifier) GetSubscriptions(stock domain.Stock) map[ports.WebSocketConn]struct{} {
+	clientsCopy := make(map[ports.WebSocketConn]struct{})
+	clientsInterface, ok := n.subscriptions.Load(stock)
+	if !ok {
+		return clientsCopy // Return empty map
 	}
 
-	return nil
+	clients := clientsInterface.(*sync.Map)
+	clients.Range(func(key, _ interface{}) bool {
+		ws := key.(ports.WebSocketConn)
+		clientsCopy[ws] = struct{}{}
+		return true
+	})
+	return clientsCopy
 }
