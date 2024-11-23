@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/gorilla/websocket"
+	"net"
 )
 
 type PriceService interface {
@@ -33,8 +34,14 @@ type PriceEventListener interface {
 
 type Notifier interface {
 	Broadcast(event *domain.PriceEvent) error
-	AddClient(ws *websocket.Conn)
-	RemoveClient(ws *websocket.Conn)
-	Subscribe(ws *websocket.Conn, stock domain.Stock) error
-	Unsubscribe(ws *websocket.Conn, stock domain.Stock) error
+	AddClient(ws WebSocketConn)
+	RemoveClient(ws WebSocketConn)
+	Subscribe(ws WebSocketConn, stock domain.Stock) error
+	Unsubscribe(ws WebSocketConn, stock domain.Stock) error
+}
+
+type WebSocketConn interface {
+	WriteMessage(messageType int, data []byte) error
+	Close() error
+	RemoteAddr() net.Addr
 }

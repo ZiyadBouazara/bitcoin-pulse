@@ -5,24 +5,24 @@ import (
 	"errors"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
-	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"testing"
 )
 
-func setup(t *testing.T) (*gomock.Controller, *mocks.MockNotifier, *mocks.MockConsumer, *PriceService) {
+func setup(t *testing.T) (*gomock.Controller, *mocks.MockNotifier, *mocks.MockWebSocketConn, *mocks.MockConsumer, *PriceService) {
 	ctrl := gomock.NewController(t)
 	mockNotifier := mocks.NewMockNotifier(ctrl)
+	mockConn := mocks.NewMockWebSocketConn(ctrl)
 	mockConsumer := mocks.NewMockConsumer(ctrl)
 	stubLogger := &mocks.StubLogger{}
 	service := NewPriceService(mockNotifier, mockConsumer, stubLogger)
 
-	return ctrl, mockNotifier, mockConsumer, service
+	return ctrl, mockNotifier, mockConn, mockConsumer, service
 }
 
 func TestPriceService_StartConsuming_WithError(t *testing.T) {
-	ctrl, _, mockConsumer, priceService := setup(t)
+	ctrl, _, _, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
@@ -35,7 +35,7 @@ func TestPriceService_StartConsuming_WithError(t *testing.T) {
 }
 
 func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
-	ctrl, _, mockConsumer, priceService := setup(t)
+	ctrl, _, _, mockConsumer, priceService := setup(t)
 	defer ctrl.Finish()
 
 	ctx := context.Background()
@@ -47,45 +47,41 @@ func TestPriceService_StartConsuming_WithNoError(t *testing.T) {
 }
 
 func TestPriceService_AddClient(t *testing.T) {
-	ctrl, mockNotifier, _, priceService := setup(t)
+	ctrl, mockNotifier, mockConn, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	ws := &websocket.Conn{}
-	mockNotifier.EXPECT().AddClient(ws)
+	mockNotifier.EXPECT().AddClient(mockConn)
 
-	priceService.AddClient(ws)
+	priceService.AddClient(mockConn)
 }
 
 func TestPriceService_RemoveClient(t *testing.T) {
-	ctrl, mockNotifier, _, priceService := setup(t)
+	ctrl, mockNotifier, mockConn, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	ws := &websocket.Conn{}
-	mockNotifier.EXPECT().RemoveClient(ws)
+	mockNotifier.EXPECT().RemoveClient(mockConn)
 
-	priceService.RemoveClient(ws)
+	priceService.RemoveClient(mockConn)
 }
 
 func TestPriceService_Subscribe(t *testing.T) {
-	ctrl, mockNotifier, _, priceService := setup(t)
+	ctrl, mockNotifier, mockConn, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	ws := &websocket.Conn{}
 	stock := domain.Stock("BTC-USD")
-	mockNotifier.EXPECT().Subscribe(ws, stock).Return(nil)
+	mockNotifier.EXPECT().Subscribe(mockConn, stock).Return(nil)
 
-	err := priceService.Subscribe(ws, stock)
+	err := priceService.Subscribe(mockConn, stock)
 	assert.NoError(t, err)
 }
 
 func TestPriceService_Unsubscribe(t *testing.T) {
-	ctrl, mockNotifier, _, priceService := setup(t)
+	ctrl, mockNotifier, mockConn, _, priceService := setup(t)
 	defer ctrl.Finish()
 
-	ws := &websocket.Conn{}
 	stock := domain.Stock("BTC-USD")
-	mockNotifier.EXPECT().Unsubscribe(ws, stock).Return(nil)
+	mockNotifier.EXPECT().Unsubscribe(mockConn, stock).Return(nil)
 
-	err := priceService.Unsubscribe(ws, stock)
+	err := priceService.Unsubscribe(mockConn, stock)
 	assert.NoError(t, err)
 }

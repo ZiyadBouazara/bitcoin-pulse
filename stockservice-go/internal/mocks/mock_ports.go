@@ -11,9 +11,11 @@ package mocks
 
 import (
 	context "context"
+	net "net"
 	reflect "reflect"
 
 	domain "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
+	ports "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 	websocket "github.com/gorilla/websocket"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -310,7 +312,7 @@ func (m *MockNotifier) EXPECT() *MockNotifierMockRecorder {
 }
 
 // AddClient mocks base method.
-func (m *MockNotifier) AddClient(ws *websocket.Conn) {
+func (m *MockNotifier) AddClient(ws ports.WebSocketConn) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "AddClient", ws)
 }
@@ -336,7 +338,7 @@ func (mr *MockNotifierMockRecorder) Broadcast(event any) *gomock.Call {
 }
 
 // RemoveClient mocks base method.
-func (m *MockNotifier) RemoveClient(ws *websocket.Conn) {
+func (m *MockNotifier) RemoveClient(ws ports.WebSocketConn) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "RemoveClient", ws)
 }
@@ -348,7 +350,7 @@ func (mr *MockNotifierMockRecorder) RemoveClient(ws any) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockNotifier) Subscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (m *MockNotifier) Subscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subscribe", ws, stock)
 	ret0, _ := ret[0].(error)
@@ -362,7 +364,7 @@ func (mr *MockNotifierMockRecorder) Subscribe(ws, stock any) *gomock.Call {
 }
 
 // Unsubscribe mocks base method.
-func (m *MockNotifier) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (m *MockNotifier) Unsubscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unsubscribe", ws, stock)
 	ret0, _ := ret[0].(error)
@@ -373,4 +375,70 @@ func (m *MockNotifier) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error
 func (mr *MockNotifierMockRecorder) Unsubscribe(ws, stock any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unsubscribe", reflect.TypeOf((*MockNotifier)(nil).Unsubscribe), ws, stock)
+}
+
+// MockWebSocketConn is a mock of WebSocketConn interface.
+type MockWebSocketConn struct {
+	ctrl     *gomock.Controller
+	recorder *MockWebSocketConnMockRecorder
+	isgomock struct{}
+}
+
+// MockWebSocketConnMockRecorder is the mock recorder for MockWebSocketConn.
+type MockWebSocketConnMockRecorder struct {
+	mock *MockWebSocketConn
+}
+
+// NewMockWebSocketConn creates a new mock instance.
+func NewMockWebSocketConn(ctrl *gomock.Controller) *MockWebSocketConn {
+	mock := &MockWebSocketConn{ctrl: ctrl}
+	mock.recorder = &MockWebSocketConnMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockWebSocketConn) EXPECT() *MockWebSocketConnMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockWebSocketConn) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockWebSocketConnMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockWebSocketConn)(nil).Close))
+}
+
+// RemoteAddr mocks base method.
+func (m *MockWebSocketConn) RemoteAddr() net.Addr {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoteAddr")
+	ret0, _ := ret[0].(net.Addr)
+	return ret0
+}
+
+// RemoteAddr indicates an expected call of RemoteAddr.
+func (mr *MockWebSocketConnMockRecorder) RemoteAddr() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoteAddr", reflect.TypeOf((*MockWebSocketConn)(nil).RemoteAddr))
+}
+
+// WriteMessage mocks base method.
+func (m *MockWebSocketConn) WriteMessage(messageType int, data []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteMessage", messageType, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteMessage indicates an expected call of WriteMessage.
+func (mr *MockWebSocketConnMockRecorder) WriteMessage(messageType, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMessage", reflect.TypeOf((*MockWebSocketConn)(nil).WriteMessage), messageType, data)
 }

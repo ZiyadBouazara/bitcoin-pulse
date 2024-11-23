@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
-	"github.com/gorilla/websocket"
 )
 
 type PriceService struct {
@@ -31,15 +30,15 @@ func (ps *PriceService) StartConsuming(ctx context.Context) {
 	}
 }
 
-func (ps *PriceService) AddClient(ws *websocket.Conn) {
+func (ps *PriceService) AddClient(ws ports.WebSocketConn) {
 	ps.notifier.AddClient(ws)
 }
 
-func (ps *PriceService) RemoveClient(ws *websocket.Conn) {
+func (ps *PriceService) RemoveClient(ws ports.WebSocketConn) {
 	ps.notifier.RemoveClient(ws)
 }
 
-func (ps *PriceService) Subscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (ps *PriceService) Subscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	err := ps.notifier.Subscribe(ws, stock)
 	if err != nil {
 		ps.logger.Errorf("error subscribing Client: %v", ws.RemoteAddr())
@@ -47,7 +46,7 @@ func (ps *PriceService) Subscribe(ws *websocket.Conn, stock domain.Stock) error 
 	return nil
 }
 
-func (ps *PriceService) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (ps *PriceService) Unsubscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	err := ps.notifier.Unsubscribe(ws, stock)
 	if err != nil {
 		ps.logger.Errorf("error unsubscribing Client: %v", ws.RemoteAddr())
