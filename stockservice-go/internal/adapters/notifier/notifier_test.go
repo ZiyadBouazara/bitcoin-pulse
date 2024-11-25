@@ -13,63 +13,75 @@ import (
 
 var aStock = domain.Stock("BTC-USD")
 
-func setup(t *testing.T) (*gomock.Controller, *mocks.StubLogger, *mocks.MockWebSocketConn, *Notifier) {
+type testDependencies struct {
+	ctrl       *gomock.Controller
+	stubLogger *mocks.StubLogger
+	mockConn   *mocks.MockWebSocketConn
+	notifier   *Notifier
+}
+
+func setup(t *testing.T) *testDependencies {
 	ctrl := gomock.NewController(t)
 	stubLogger := &mocks.StubLogger{}
 	mockConn := mocks.NewMockWebSocketConn(ctrl)
 	notifier := NewNotifier(stubLogger)
-	return ctrl, stubLogger, mockConn, notifier
+	return &testDependencies{
+		ctrl:       ctrl,
+		stubLogger: stubLogger,
+		mockConn:   mockConn,
+		notifier:   notifier,
+	}
 }
 
 func TestNotifier_AddClient(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	notifier.AddClient(mockConn)
+	deps.notifier.AddClient(deps.mockConn)
 
-	assert.Contains(t, notifier.GetConnections(), mockConn)
+	assert.Contains(t, deps.notifier.GetConnections(), deps.mockConn)
 }
 
 func TestNotifier_RemoveClient(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	notifier.AddClient(mockConn)
-	notifier.RemoveClient(mockConn)
+	deps.notifier.AddClient(deps.mockConn)
+	deps.notifier.RemoveClient(deps.mockConn)
 
-	assert.NotContains(t, notifier.GetConnections(), mockConn)
+	assert.NotContains(t, deps.notifier.GetConnections(), deps.mockConn)
 }
 
 func TestNotifier_Subscribe(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
-	err := notifier.Subscribe(mockConn, aStock)
+	deps.mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
+	err := deps.notifier.Subscribe(deps.mockConn, aStock)
 
 	assert.NoError(t, err)
-	assert.Contains(t, notifier.GetSubscriptions(aStock), mockConn)
+	assert.Contains(t, deps.notifier.GetSubscriptions(aStock), deps.mockConn)
 }
 
 func TestNotifier_Unsubscribe(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
-	_ = notifier.Subscribe(mockConn, aStock)
+	deps.mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
+	_ = deps.notifier.Subscribe(deps.mockConn, aStock)
 
-	err := notifier.Unsubscribe(mockConn, aStock)
+	err := deps.notifier.Unsubscribe(deps.mockConn, aStock)
 
 	assert.NoError(t, err)
-	assert.NotContains(t, notifier.GetSubscriptions(aStock), mockConn)
+	assert.NotContains(t, deps.notifier.GetSubscriptions(aStock), deps.mockConn)
 }
 
 func TestNotifier_Broadcast(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
-	_ = notifier.Subscribe(mockConn, aStock)
+	deps.mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
+	_ = deps.notifier.Subscribe(deps.mockConn, aStock)
 
 	event := &domain.PriceEvent{
 		ProductID: aStock,
@@ -78,20 +90,20 @@ func TestNotifier_Broadcast(t *testing.T) {
 
 	msg, err := json.Marshal(event)
 	assert.NoError(t, err)
-	mockConn.EXPECT().WriteMessage(websocket.TextMessage, msg).Return(nil).Times(1)
+	deps.mockConn.EXPECT().WriteMessage(websocket.TextMessage, msg).Return(nil).Times(1)
 
-	err = notifier.Broadcast(event)
+	err = deps.notifier.Broadcast(event)
 
 	assert.NoError(t, err)
 }
 
 func TestNotifier_Broadcast_WriteMessageError(t *testing.T) {
-	ctrl, _, mockConn, notifier := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
-	mockConn.EXPECT().Close().Return(nil)
-	_ = notifier.Subscribe(mockConn, aStock)
+	deps.mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
+	deps.mockConn.EXPECT().Close().Return(nil)
+	_ = deps.notifier.Subscribe(deps.mockConn, aStock)
 
 	event := &domain.PriceEvent{
 		ProductID: aStock,
@@ -101,10 +113,10 @@ func TestNotifier_Broadcast_WriteMessageError(t *testing.T) {
 	msg, err := json.Marshal(event)
 	assert.NoError(t, err)
 	writeErr := fmt.Errorf("write error")
-	mockConn.EXPECT().WriteMessage(websocket.TextMessage, msg).Return(writeErr).Times(1)
+	deps.mockConn.EXPECT().WriteMessage(websocket.TextMessage, msg).Return(writeErr).Times(1)
 
-	err = notifier.Broadcast(event)
+	err = deps.notifier.Broadcast(event)
 
 	assert.NoError(t, err)
-	assert.NotContains(t, notifier.GetConnections(), mockConn)
+	assert.NotContains(t, deps.notifier.GetConnections(), deps.mockConn)
 }
