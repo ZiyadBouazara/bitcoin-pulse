@@ -26,21 +26,37 @@ func (a *stubAddr) String() string {
 	return a.address
 }
 
-func setup(t *testing.T) (*gomock.Controller, *mocks.MockPriceService, *mocks.StubLogger, *mocks.MockWebSocketConn, *stubAddr, *LivePricesHandler) {
+type testDependencies struct {
+	ctrl             *gomock.Controller
+	mockPriceService *mocks.MockPriceService
+	mockLogger       *mocks.StubLogger
+	mockConn         *mocks.MockWebSocketConn
+	stubbedAddr      *stubAddr
+	handler          *LivePricesHandler
+}
+
+func setup(t *testing.T) *testDependencies {
 	ctrl := gomock.NewController(t)
 	mockPriceService := mocks.NewMockPriceService(ctrl)
 	mockLogger := &mocks.StubLogger{}
 	mockConn := mocks.NewMockWebSocketConn(ctrl)
 	stubbedAddr := &stubAddr{address: "127.0.0.1:12345"}
 	handler := NewLivePricesHandler(mockPriceService, mockLogger)
-	return ctrl, mockPriceService, mockLogger, mockConn, stubbedAddr, handler
+	return &testDependencies{
+		ctrl:             ctrl,
+		mockPriceService: mockPriceService,
+		mockLogger:       mockLogger,
+		mockConn:         mockConn,
+		stubbedAddr:      stubbedAddr,
+		handler:          handler,
+	}
 }
 
 func TestHandleConnection_ValidSubscription(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
 	subMsg := domain.SubscriptionMessage{
 		Action: domain.Subscribe,
@@ -50,37 +66,37 @@ func TestHandleConnection_ValidSubscription(t *testing.T) {
 	assert.NoError(t, err)
 
 	gomock.InOrder(
-		mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
-		mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
+		deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
+		deps.mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
 	)
 
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	originalIsSupportedStock := domain.IsSupportedStock
 	domain.IsSupportedStock = func(stock string) bool { return true }
 	defer func() { domain.IsSupportedStock = originalIsSupportedStock }()
 
-	mockPriceService.EXPECT().Subscribe(mockConn, subMsg.Stock).Return(nil)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockPriceService.EXPECT().Subscribe(deps.mockConn, subMsg.Stock).Return(nil)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(nil, mockConn)
+	deps.handler.handleConnection(nil, deps.mockConn)
 }
 
 func TestHandleConnection_InvalidMessageFormat(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
 	invalidMessage := []byte("invalid json")
 
 	gomock.InOrder(
-		mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, invalidMessage, nil),
-		mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
+		deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, invalidMessage, nil),
+		deps.mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
 	)
 
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	expectedErrorMessage := domain.ErrorMessage{
 		Type:    "error",
@@ -89,18 +105,18 @@ func TestHandleConnection_InvalidMessageFormat(t *testing.T) {
 	expectedErrorBytes, err := json.Marshal(expectedErrorMessage)
 	assert.NoError(t, err)
 
-	mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(nil, mockConn)
+	deps.handler.handleConnection(nil, deps.mockConn)
 }
 
 func TestHandleConnection_UnsupportedStockSymbol(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
 	subMsg := domain.SubscriptionMessage{
 		Action: domain.Subscribe,
@@ -110,11 +126,11 @@ func TestHandleConnection_UnsupportedStockSymbol(t *testing.T) {
 	assert.NoError(t, err)
 
 	gomock.InOrder(
-		mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
-		mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
+		deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
+		deps.mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
 	)
 
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	originalIsSupportedStock := domain.IsSupportedStock
 	domain.IsSupportedStock = func(stock string) bool { return false }
@@ -127,18 +143,18 @@ func TestHandleConnection_UnsupportedStockSymbol(t *testing.T) {
 	expectedErrorBytes, err := json.Marshal(expectedErrorMessage)
 	assert.NoError(t, err)
 
-	mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(nil, mockConn)
+	deps.handler.handleConnection(nil, deps.mockConn)
 }
 
 func TestHandleConnection_UnknownAction(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
 	subMsg := domain.SubscriptionMessage{
 		Action: "unknown_action",
@@ -148,11 +164,11 @@ func TestHandleConnection_UnknownAction(t *testing.T) {
 	assert.NoError(t, err)
 
 	gomock.InOrder(
-		mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
-		mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
+		deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil),
+		deps.mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("EOF")),
 	)
 
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	originalIsSupportedStock := domain.IsSupportedStock
 	domain.IsSupportedStock = func(stock string) bool { return true }
@@ -165,36 +181,36 @@ func TestHandleConnection_UnknownAction(t *testing.T) {
 	expectedErrorBytes, err := json.Marshal(expectedErrorMessage)
 	assert.NoError(t, err)
 
-	mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockConn.EXPECT().WriteMessage(websocket.TextMessage, expectedErrorBytes).Return(nil)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(nil, mockConn)
+	deps.handler.handleConnection(nil, deps.mockConn)
 }
 
 func TestHandleConnection_ReadMessageError(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
-	mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("read error"))
-	mockPriceService.EXPECT().AddClient(mockConn)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockConn.EXPECT().ReadMessage().Return(0, nil, fmt.Errorf("read error"))
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(nil, mockConn)
+	deps.handler.handleConnection(nil, deps.mockConn)
 }
 
 func TestHandleConnection_SubscribeError(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, _, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
 
-	mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(nil).AnyTimes()
 
 	subMsg := domain.SubscriptionMessage{
 		Action: domain.Subscribe,
@@ -203,32 +219,32 @@ func TestHandleConnection_SubscribeError(t *testing.T) {
 	messageBytes, err := json.Marshal(subMsg)
 	assert.NoError(t, err)
 
-	mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil)
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	originalIsSupportedStock := domain.IsSupportedStock
 	domain.IsSupportedStock = func(stock string) bool { return true }
 	defer func() { domain.IsSupportedStock = originalIsSupportedStock }()
 
 	subscribeErr := fmt.Errorf("subscribe error")
-	mockPriceService.EXPECT().Subscribe(mockConn, subMsg.Stock).Return(subscribeErr)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockPriceService.EXPECT().Subscribe(deps.mockConn, subMsg.Stock).Return(subscribeErr)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(ctx, mockConn)
+	deps.handler.handleConnection(ctx, deps.mockConn)
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
 
 func TestHandleConnection_UnsubscribeError(t *testing.T) {
-	ctrl, mockPriceService, _, mockConn, stubbedAddr, handler := setup(t)
-	defer ctrl.Finish()
+	deps := setup(t)
+	defer deps.ctrl.Finish()
 
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
 
-	mockConn.EXPECT().RemoteAddr().Return(stubbedAddr).AnyTimes()
+	deps.mockConn.EXPECT().RemoteAddr().Return(deps.stubbedAddr).AnyTimes()
 
 	subMsg := domain.SubscriptionMessage{
 		Action: domain.Unsubscribe,
@@ -237,19 +253,19 @@ func TestHandleConnection_UnsubscribeError(t *testing.T) {
 	messageBytes, err := json.Marshal(subMsg)
 	assert.NoError(t, err)
 
-	mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil)
-	mockPriceService.EXPECT().AddClient(mockConn)
+	deps.mockConn.EXPECT().ReadMessage().Return(websocket.TextMessage, messageBytes, nil)
+	deps.mockPriceService.EXPECT().AddClient(deps.mockConn)
 
 	originalIsSupportedStock := domain.IsSupportedStock
 	domain.IsSupportedStock = func(stock string) bool { return true }
 	defer func() { domain.IsSupportedStock = originalIsSupportedStock }()
 
 	unsubscribeErr := fmt.Errorf("unsubscribe error")
-	mockPriceService.EXPECT().Unsubscribe(mockConn, subMsg.Stock).Return(unsubscribeErr)
-	mockPriceService.EXPECT().RemoveClient(mockConn)
-	mockConn.EXPECT().Close().Return(nil)
+	deps.mockPriceService.EXPECT().Unsubscribe(deps.mockConn, subMsg.Stock).Return(unsubscribeErr)
+	deps.mockPriceService.EXPECT().RemoveClient(deps.mockConn)
+	deps.mockConn.EXPECT().Close().Return(nil)
 
-	handler.handleConnection(ctx, mockConn)
+	deps.handler.handleConnection(ctx, deps.mockConn)
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
