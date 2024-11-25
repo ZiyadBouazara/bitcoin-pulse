@@ -29,7 +29,7 @@ The **Go Stock Service** is a high-performance, scalable service built with Go t
 
 ## Architecture
 
-![Architecture Diagram](https://via.placeholder.com/800x400?text=Architecture+Diagram)
+![Local Image](docs/architecture-stockservice.jpeg)
 
 1. **Kafka Broker:** Acts as the central hub for stock price data.
 2. **Go Stock Service:** Consumes data from Kafka, processes it, and performs necessary actions.
