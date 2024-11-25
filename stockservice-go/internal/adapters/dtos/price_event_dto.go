@@ -2,7 +2,7 @@ package dtos
 
 import (
 	"fmt"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"strconv"
 	"time"
 )
@@ -75,6 +75,11 @@ func ToPriceEvent(dto *PriceEventDTO) (*domain.PriceEvent, error) {
 		return f, nil
 	}
 
+	if !domain.IsSupportedStock(dto.ProductID) {
+		return nil, fmt.Errorf("unsupported stock: %v", dto.ProductID)
+	}
+	productID := domain.Stock(dto.ProductID)
+
 	price, err := parseFloat(dto.Price, "Price")
 	if err != nil {
 		return nil, err
@@ -138,7 +143,7 @@ func ToPriceEvent(dto *PriceEventDTO) (*domain.PriceEvent, error) {
 	event := &domain.PriceEvent{
 		Type:        dto.Type,
 		Sequence:    dto.Sequence,
-		ProductID:   dto.ProductID,
+		ProductID:   productID,
 		Price:       price,
 		Open24H:     open24h,
 		Volume24H:   volume24h,

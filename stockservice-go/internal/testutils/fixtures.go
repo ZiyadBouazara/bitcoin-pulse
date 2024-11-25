@@ -1,8 +1,8 @@
 package testutils
 
 import (
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"time"
 )
 
