@@ -47,7 +47,7 @@ const (
 	StockBitcoin Stock = "BTC-USD"
 )
 
-func IsSupportedStock(stock string) bool {
+var IsSupportedStock = func(stock string) bool {
 	switch Stock(stock) {
 	case StockBitcoin:
 		return true

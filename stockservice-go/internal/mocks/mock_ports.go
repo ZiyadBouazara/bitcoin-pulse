@@ -16,7 +16,6 @@ import (
 
 	domain "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	ports "github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
-	websocket "github.com/gorilla/websocket"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -45,7 +44,7 @@ func (m *MockPriceService) EXPECT() *MockPriceServiceMockRecorder {
 }
 
 // AddClient mocks base method.
-func (m *MockPriceService) AddClient(ws *websocket.Conn) {
+func (m *MockPriceService) AddClient(ws ports.WebSocketConn) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "AddClient", ws)
 }
@@ -57,7 +56,7 @@ func (mr *MockPriceServiceMockRecorder) AddClient(ws any) *gomock.Call {
 }
 
 // RemoveClient mocks base method.
-func (m *MockPriceService) RemoveClient(ws *websocket.Conn) {
+func (m *MockPriceService) RemoveClient(ws ports.WebSocketConn) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "RemoveClient", ws)
 }
@@ -81,7 +80,7 @@ func (mr *MockPriceServiceMockRecorder) StartConsuming(ctx any) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockPriceService) Subscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (m *MockPriceService) Subscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subscribe", ws, stock)
 	ret0, _ := ret[0].(error)
@@ -95,7 +94,7 @@ func (mr *MockPriceServiceMockRecorder) Subscribe(ws, stock any) *gomock.Call {
 }
 
 // Unsubscribe mocks base method.
-func (m *MockPriceService) Unsubscribe(ws *websocket.Conn, stock domain.Stock) error {
+func (m *MockPriceService) Unsubscribe(ws ports.WebSocketConn, stock domain.Stock) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unsubscribe", ws, stock)
 	ret0, _ := ret[0].(error)
@@ -413,6 +412,22 @@ func (m *MockWebSocketConn) Close() error {
 func (mr *MockWebSocketConnMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockWebSocketConn)(nil).Close))
+}
+
+// ReadMessage mocks base method.
+func (m *MockWebSocketConn) ReadMessage() (int, []byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadMessage")
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].([]byte)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ReadMessage indicates an expected call of ReadMessage.
+func (mr *MockWebSocketConnMockRecorder) ReadMessage() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMessage", reflect.TypeOf((*MockWebSocketConn)(nil).ReadMessage))
 }
 
 // RemoteAddr mocks base method.

@@ -38,7 +38,7 @@ func (h *LivePricesHandler) HandleWebSocket(ctx *gin.Context) {
 	go h.handleConnection(ctx, ws)
 }
 
-func (h *LivePricesHandler) handleConnection(ctx *gin.Context, ws *websocket.Conn) {
+func (h *LivePricesHandler) handleConnection(ctx *gin.Context, ws ports.WebSocketConn) {
 	h.logger.Infof("New client connected: %v", ws.RemoteAddr())
 	defer func() {
 		h.priceService.RemoveClient(ws)
@@ -90,7 +90,7 @@ func (h *LivePricesHandler) handleConnection(ctx *gin.Context, ws *websocket.Con
 	}
 }
 
-func (h *LivePricesHandler) sendError(ws *websocket.Conn, errorMessage string) {
+func (h *LivePricesHandler) sendError(ws ports.WebSocketConn, errorMessage string) {
 	errMsg := domain.ErrorMessage{
 		Type:    "error",
 		Message: errorMessage,
