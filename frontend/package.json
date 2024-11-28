@@ -8,6 +8,7 @@
         "@mui/material": "latest",
         "@types/react": "latest",
         "@types/react-dom": "latest",
+        "lightweight-charts": "^4.2.1",
         "react": "latest",
         "react-dom": "latest",
         "react-scripts": "latest",

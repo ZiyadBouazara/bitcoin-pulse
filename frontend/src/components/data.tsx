@@ -1,15 +1,5 @@
-import * as React from "react";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
-import {ChartData, colors} from "./components/Chart";
-import ChartComponent from "./components/Chart";
-import {Stack} from "@mui/material";
-import RangeChart from "./components/RangeChart";
-
-
-const dayData: ChartData[] = [
+// TODO: For refactoring purposes
+const dayData = [
     { time: '2018-10-19', value: 26.19 },
     { time: '2018-10-22', value: 25.87 },
     { time: '2018-10-23', value: 25.83 },
@@ -129,9 +119,40 @@ const dayData: ChartData[] = [
     { time: '2019-04-09', value: 26.07 },
     { time: '2019-04-10', value: 26.13 },
     { time: '2019-04-11', value: 26.04 },
+    { time: '2019-04-12', value: 26.04 },
+    { time: '2019-04-15', value: 26.05 },
+    { time: '2019-04-16', value: 26.01 },
+    { time: '2019-04-17', value: 26.09 },
+    { time: '2019-04-18', value: 26.0 },
+    { time: '2019-04-22', value: 26.0 },
+    { time: '2019-04-23', value: 26.06 },
+    { time: '2019-04-24', value: 26.0 },
+    { time: '2019-04-25', value: 25.81 },
+    { time: '2019-04-26', value: 25.88 },
+    { time: '2019-04-29', value: 25.91 },
+    { time: '2019-04-30', value: 25.9 },
+    { time: '2019-05-01', value: 26.02 },
+    { time: '2019-05-02', value: 25.97 },
+    { time: '2019-05-03', value: 26.02 },
+    { time: '2019-05-06', value: 26.03 },
+    { time: '2019-05-07', value: 26.04 },
+    { time: '2019-05-08', value: 26.05 },
+    { time: '2019-05-09', value: 26.05 },
+    { time: '2019-05-10', value: 26.08 },
+    { time: '2019-05-13', value: 26.05 },
+    { time: '2019-05-14', value: 26.01 },
+    { time: '2019-05-15', value: 26.03 },
+    { time: '2019-05-16', value: 26.14 },
+    { time: '2019-05-17', value: 26.09 },
+    { time: '2019-05-20', value: 26.01 },
+    { time: '2019-05-21', value: 26.12 },
+    { time: '2019-05-22', value: 26.15 },
+    { time: '2019-05-23', value: 26.18 },
+    { time: '2019-05-24', value: 26.16 },
+    { time: '2019-05-28', value: 26.23 },
 ];
 
-const weekData: ChartData[] = [
+const weekData = [
     { time: '2016-07-18', value: 26.1 },
     { time: '2016-07-25', value: 26.19 },
     { time: '2016-08-01', value: 26.24 },
@@ -219,9 +240,72 @@ const weekData: ChartData[] = [
     { time: '2018-02-26', value: 25.77 },
     { time: '2018-03-05', value: 25.81 },
     { time: '2018-03-12', value: 25.88 },
+    { time: '2018-03-19', value: 25.72 },
+    { time: '2018-03-26', value: 25.75 },
+    { time: '2018-04-02', value: 25.7 },
+    { time: '2018-04-09', value: 25.73 },
+    { time: '2018-04-16', value: 25.74 },
+    { time: '2018-04-23', value: 25.69 },
+    { time: '2018-04-30', value: 25.76 },
+    { time: '2018-05-07', value: 25.89 },
+    { time: '2018-05-14', value: 25.89 },
+    { time: '2018-05-21', value: 26.0 },
+    { time: '2018-05-28', value: 25.79 },
+    { time: '2018-06-04', value: 26.11 },
+    { time: '2018-06-11', value: 26.43 },
+    { time: '2018-06-18', value: 26.3 },
+    { time: '2018-06-25', value: 26.58 },
+    { time: '2018-07-02', value: 26.33 },
+    { time: '2018-07-09', value: 26.33 },
+    { time: '2018-07-16', value: 26.32 },
+    { time: '2018-07-23', value: 26.2 },
+    { time: '2018-07-30', value: 26.03 },
+    { time: '2018-08-06', value: 26.15 },
+    { time: '2018-08-13', value: 26.17 },
+    { time: '2018-08-20', value: 26.28 },
+    { time: '2018-08-27', value: 25.86 },
+    { time: '2018-09-03', value: 25.69 },
+    { time: '2018-09-10', value: 25.69 },
+    { time: '2018-09-17', value: 25.64 },
+    { time: '2018-09-24', value: 25.67 },
+    { time: '2018-10-01', value: 25.55 },
+    { time: '2018-10-08', value: 25.59 },
+    { time: '2018-10-15', value: 26.19 },
+    { time: '2018-10-22', value: 25.81 },
+    { time: '2018-10-29', value: 25.74 },
+    { time: '2018-11-05', value: 25.75 },
+    { time: '2018-11-12', value: 25.75 },
+    { time: '2018-11-19', value: 25.72 },
+    { time: '2018-11-26', value: 25.41 },
+    { time: '2018-12-03', value: 25.39 },
+    { time: '2018-12-10', value: 25.52 },
+    { time: '2018-12-17', value: 25.66 },
+    { time: '2018-12-24', value: 25.68 },
+    { time: '2018-12-31', value: 25.71 },
+    { time: '2019-01-07', value: 25.92 },
+    { time: '2019-01-14', value: 25.6 },
+    { time: '2019-01-21', value: 25.8 },
+    { time: '2019-01-28', value: 25.6 },
+    { time: '2019-02-04', value: 25.72 },
+    { time: '2019-02-11', value: 25.89 },
+    { time: '2019-02-18', value: 26.0 },
+    { time: '2019-02-25', value: 25.86 },
+    { time: '2019-03-04', value: 25.94 },
+    { time: '2019-03-11', value: 26.11 },
+    { time: '2019-03-18', value: 25.88 },
+    { time: '2019-03-25', value: 25.77 },
+    { time: '2019-04-01', value: 26.16 },
+    { time: '2019-04-08', value: 26.04 },
+    { time: '2019-04-15', value: 26.0 },
+    { time: '2019-04-22', value: 25.88 },
+    { time: '2019-04-29', value: 26.02 },
+    { time: '2019-05-06', value: 26.08 },
+    { time: '2019-05-13', value: 26.09 },
+    { time: '2019-05-20', value: 26.16 },
+    { time: '2019-05-27', value: 26.23 },
 ];
 
-const monthData: ChartData[] = [
+const monthData = [
     { time: '2006-12-01', value: 25.4 },
     { time: '2007-01-01', value: 25.5 },
     { time: '2007-02-01', value: 25.11 },
@@ -307,9 +391,74 @@ const monthData: ChartData[] = [
     { time: '2013-10-01', value: 24.62 },
     { time: '2013-11-01', value: 24.65 },
     { time: '2013-12-02', value: 24.7 },
+    { time: '2014-01-01', value: 24.98 },
+    { time: '2014-02-03', value: 24.95 },
+    { time: '2014-03-03', value: 25.45 },
+    { time: '2014-04-01', value: 25.4 },
+    { time: '2014-05-01', value: 25.51 },
+    { time: '2014-06-02', value: 25.34 },
+    { time: '2014-07-01', value: 25.3 },
+    { time: '2014-08-01', value: 25.36 },
+    { time: '2014-09-01', value: 25.16 },
+    { time: '2014-10-01', value: 25.53 },
+    { time: '2014-11-03', value: 25.4 },
+    { time: '2014-12-01', value: 25.7 },
+    { time: '2015-01-01', value: 25.95 },
+    { time: '2015-02-02', value: 25.81 },
+    { time: '2015-03-02', value: 25.63 },
+    { time: '2015-04-01', value: 25.39 },
+    { time: '2015-05-01', value: 25.62 },
+    { time: '2015-06-01', value: 25.23 },
+    { time: '2015-07-01', value: 25.47 },
+    { time: '2015-08-03', value: 25.18 },
+    { time: '2015-09-01', value: 25.3 },
+    { time: '2015-10-01', value: 25.68 },
+    { time: '2015-11-02', value: 25.63 },
+    { time: '2015-12-01', value: 25.57 },
+    { time: '2016-01-01', value: 25.55 },
+    { time: '2016-02-01', value: 25.05 },
+    { time: '2016-03-01', value: 25.61 },
+    { time: '2016-04-01', value: 25.91 },
+    { time: '2016-05-02', value: 25.84 },
+    { time: '2016-06-01', value: 25.94 },
+    { time: '2016-07-01', value: 26.19 },
+    { time: '2016-08-01', value: 26.06 },
+    { time: '2016-09-01', value: 25.65 },
+    { time: '2016-10-03', value: 25.8 },
+    { time: '2016-11-01', value: 25.06 },
+    { time: '2016-12-01', value: 25.2 },
+    { time: '2017-01-02', value: 25.7 },
+    { time: '2017-02-01', value: 25.78 },
+    { time: '2017-03-01', value: 25.9 },
+    { time: '2017-04-03', value: 26.02 },
+    { time: '2017-05-01', value: 26.02 },
+    { time: '2017-06-01', value: 26.39 },
+    { time: '2017-07-03', value: 26.3 },
+    { time: '2017-08-01', value: 26.14 },
+    { time: '2017-09-01', value: 26.39 },
+    { time: '2017-10-02', value: 26.12 },
+    { time: '2017-11-01', value: 25.81 },
+    { time: '2017-12-01', value: 25.82 },
+    { time: '2018-01-01', value: 26.06 },
+    { time: '2018-02-01', value: 25.78 },
+    { time: '2018-03-01', value: 25.75 },
+    { time: '2018-04-02', value: 25.72 },
+    { time: '2018-05-01', value: 25.75 },
+    { time: '2018-06-01', value: 26.58 },
+    { time: '2018-07-02', value: 26.14 },
+    { time: '2018-08-01', value: 25.86 },
+    { time: '2018-09-03', value: 25.67 },
+    { time: '2018-10-01', value: 25.82 },
+    { time: '2018-11-01', value: 25.41 },
+    { time: '2018-12-03', value: 25.77 },
+    { time: '2019-01-01', value: 25.35 },
+    { time: '2019-02-01', value: 25.79 },
+    { time: '2019-03-01', value: 25.77 },
+    { time: '2019-04-01', value: 25.9 },
+    { time: '2019-05-01', value: 26.23 },
 ];
 
-const yearData: ChartData[] = [
+export const yearData = [
     { time: '2006-01-02', value: 24.89 },
     { time: '2007-01-01', value: 25.5 },
     { time: '2008-01-01', value: 23.9 },
@@ -326,56 +475,9 @@ const yearData: ChartData[] = [
     { time: '2019-01-01', value: 26.23 },
 ];
 
-// Map of datasets
-const seriesesData = new Map<string, ChartData[]>([
+export const seriesesData = new Map([
     ['1D', dayData],
     ['1W', weekData],
     ['1M', monthData],
     ['1Y', yearData],
 ]);
-
-// Interval colors
-const intervalColors = {
-    '1D': '#2962FF',
-    '1W': 'rgb(225, 87, 90)',
-    '1M': 'rgb(242, 142, 44)',
-    '1Y': 'rgb(164, 89, 209)',
-};
-
-
-
-function Copyright() {
-    return (
-        <Typography
-            variant="body2"
-            align="center"
-            sx={{
-                color: "text.secondary",
-            }}
-        >
-            {"Copyright © "}
-            <Link color="inherit" href="https://mui.com/">
-                Bitcoin Pulse
-            </Link>{" "}
-            {new Date().getFullYear()}.
-        </Typography>
-    );
-}
-
-function App() {
-    return (
-        <Container maxWidth="sm">
-            <Box sx={{ my: 4 }}>
-                <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-                    Bitcoin Pulse
-                </Typography>
-                <Copyright />
-                <Stack>
-                    <RangeChart data={seriesesData} intervalColors={intervalColors} initialInterval="1D" />
-                </Stack>
-            </Box>
-        </Container>
-    );
-}
-
-export default App;
