@@ -1,9 +1,10 @@
 package testutils
 
 import (
+	"time"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
-	"time"
 )
 
 func CreateValidPriceEvent() *domain.PriceEvent {

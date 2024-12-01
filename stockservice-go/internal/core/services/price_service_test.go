@@ -3,11 +3,12 @@ package services
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func setup(t *testing.T) (*gomock.Controller, *mocks.MockNotifier, *mocks.MockWebSocketConn, *mocks.MockConsumer, *PriceService) {

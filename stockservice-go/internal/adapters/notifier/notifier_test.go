@@ -3,12 +3,13 @@ package notifier
 import (
 	"encoding/json"
 	"fmt"
+	"testing"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 var aStock = domain.Stock("BTC-USD")

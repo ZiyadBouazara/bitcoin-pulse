@@ -2,8 +2,9 @@ package ports
 
 import (
 	"context"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"net"
+
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 )
 
 type PriceService interface {

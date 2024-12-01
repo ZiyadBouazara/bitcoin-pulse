@@ -3,15 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 type stubAddr struct {

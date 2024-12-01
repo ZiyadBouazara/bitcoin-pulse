@@ -3,10 +3,11 @@ package notifier
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 	"github.com/gorilla/websocket"
-	"sync"
 )
 
 type Notifier struct {

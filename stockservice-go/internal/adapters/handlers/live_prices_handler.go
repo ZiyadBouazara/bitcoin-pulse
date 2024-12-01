@@ -3,11 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"net/http"
 )
 
 var upgrader = websocket.Upgrader{

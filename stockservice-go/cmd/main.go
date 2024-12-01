@@ -3,6 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/config"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/handlers"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/kafka"
@@ -10,11 +16,6 @@ import (
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/notifier"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/services"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/joho/godotenv"
 )

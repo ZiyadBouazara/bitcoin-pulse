@@ -1,10 +1,11 @@
 package dtos_test
 
 import (
+	"testing"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/testutils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestToPriceEvent_Success(t *testing.T) {

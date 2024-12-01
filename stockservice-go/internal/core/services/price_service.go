@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 )

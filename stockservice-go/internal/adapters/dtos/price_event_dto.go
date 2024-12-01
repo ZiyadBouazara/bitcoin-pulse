@@ -2,9 +2,10 @@ package dtos
 
 import (
 	"fmt"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 	"strconv"
 	"time"
+
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
 )
 
 type PriceEventDTO struct {
