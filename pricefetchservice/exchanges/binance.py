@@ -1,33 +1,52 @@
 import asyncio
+import json
 import logging
 
 import ccxt.pro as ccxtpro
 from kafka import KafkaProducer
 
-from models import PriceEvent
+from exchanges.exchange_list import Exchange
+from models.models import PriceEvent
 
 logger = logging.getLogger(__name__)
 
+EXCHANGE_NAME = Exchange.BINANCE.value
+SYMBOL = "BTC/USDT"
+
 
 async def stream(producer: KafkaProducer):
-    exchange_name = "binance"
     exchange = ccxtpro.binance()
-    symbol = "BTC/USDT"
+    try:
+        while True:
+            try:
+                ticker = await exchange.watch_ticker(SYMBOL)
+                price_event = PriceEvent(
+                    exchange=EXCHANGE_NAME,
+                    symbol=ticker["symbol"],
+                    last=ticker["last"],
+                    timestamp=ticker["timestamp"],
+                    change=ticker["change"],
+                    percentage=ticker["percentage"],
+                    bid=ticker["bid"],
+                    ask=ticker["ask"],
+                    open=ticker["open"],
+                    high=ticker["high"],
+                    low=ticker["low"],
+                    quoteVolume=ticker["quoteVolume"],
+                    baseVolume=ticker["baseVolume"],
+                )
 
-    while True:
-        try:
-            ticker = await exchange.watch_ticker(symbol)
-            price_event = PriceEvent(
-                exchange=exchange_name,
-                symbol=ticker["symbol"],
-                price=ticker["last"],
-                timestamp=ticker["timestamp"],
-            )
-
-            producer.send(
-                "price-updates", key=exchange_name, value=price_event.__dict__
-            )
-            logger.info(f"Price Event sent: {price_event}")
-        except Exception as e:
-            logger.error(f"Error in {exchange_name} stream: {e}")
-            await asyncio.sleep(5)
+                producer.send(
+                    "price-updates", key=EXCHANGE_NAME, value=price_event.__dict__
+                )
+                price_event_json = json.dumps(price_event.__dict__, indent=4)
+                logger.info(
+                    f"\n🚀🚀🚀 {SYMBOL} Price Event sent 🚀🚀🚀:\n{price_event_json}"
+                )
+            except Exception as e:
+                logger.error(f"Error in {EXCHANGE_NAME} stream: {e}")
+                await asyncio.sleep(5)
+    except KeyboardInterrupt:
+        logger.info(f"Closing {EXCHANGE_NAME} feed")
+    finally:
+        await exchange.close()
