@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pricefetchservice"
+version = "0.1.0"
+description = "Crypto exchanges price feeds"
+authors = ["ZiyadBouazara <ziyad.bouazara.1@ulaval.ca>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ccxt = "^4.4.35"
+kafka-python = "^2.0.2"
+python-dotenv = "^1.0.1"
+orjson = "^3.10.12"
+flake8 = "^7.1.1"
+black = "^24.10.0"
+isort = "^5.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

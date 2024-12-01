@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Poetry virtual environment
+.env/
+.venv/
+poetry.lock
+
+# Environment Variables
+*.env
+
+# Logs
+*.log
+
+# Kafka-related temporary files
+kafka-logs/
+zookeeper/
+
+# IDE and Editor settings
+.idea/
+.vscode/
+*.iml
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Docker
+docker-compose.override.yml
