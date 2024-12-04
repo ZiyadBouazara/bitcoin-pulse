@@ -1,16 +1,16 @@
 import asyncio
-import importlib
 import logging
 
 from dotenv import load_dotenv
 
-from exchanges.exchange_list import Exchange
+from exchanges.exchange import BaseExchange
+from exchanges.exchange_config import exchange_config
 from infrastructure.kafka_config import create_kafka_topic, get_kafka_producer
 
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.ERROR,
     format="[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
     handlers=[logging.StreamHandler()],
 )
@@ -24,16 +24,13 @@ async def main():
 
     producer = get_kafka_producer()
     tasks = []
-    exchanges = Exchange.list()
 
-    for name in exchanges:
-        module_name = f"exchanges.{name}"
-        try:
-            module = importlib.import_module(module_name)
-            tasks.append(module.stream(producer))
-            logger.info(f"Started streaming for exchange: {name}")
-        except ModuleNotFoundError:
-            logger.error(f"Exchange module '{module_name}' not found.")
+    for exchange_name, params in exchange_config.items():
+        symbol = params["symbol"]
+        exchange_stream = BaseExchange(exchange_name, symbol, producer)
+        tasks.append(exchange_stream.stream_ticker())
+        logger.info(f"Started streaming for exchange: {exchange_name}")
+
     try:
         await asyncio.gather(*tasks)
     except KeyboardInterrupt:
