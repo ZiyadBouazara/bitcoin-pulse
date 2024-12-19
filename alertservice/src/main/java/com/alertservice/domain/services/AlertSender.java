@@ -6,13 +6,8 @@ import software.amazon.awssdk.services.sns.SnsClient;
 
 import java.util.List;
 
-public class AlertSender {
-    SnsClient sns_client = SnsClient.create();
-    SnsAsyncClient sns_async_client = SnsAsyncClient.create();
+public interface AlertSender {
 
-    // todo: implement AWS SNS sender or any other service here.
-
-    void sendAlerts(List<Alert> alerts) {
-    }
+    void sendAlerts(List<Alert> alerts);
 
 }

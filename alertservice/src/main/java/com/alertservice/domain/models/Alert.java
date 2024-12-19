@@ -15,6 +15,6 @@ public record Alert(
         @Nullable
         String phone,
         @JsonProperty("price")
-        BtcPrice bitcoinPrice
+        BtcPrice triggerPrice
 ) {
 }

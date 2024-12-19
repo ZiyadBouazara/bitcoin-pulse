@@ -17,14 +17,18 @@ public class AlertRessource {
 
     @PostMapping
     public void createAlert(@RequestBody AlertRequest alertRequest) {
-        Alert alert = AlertMapper.fromRequest(alertRequest);
-        alertService.createAlert(alert);
+        alertService.createAlert(
+                alertRequest.getPrice(),
+                alertRequest.getPriceDifference(),
+                alertRequest.getEmail(),
+                alertRequest.getPhone()
+                );
     }
 
     @PutMapping("/{id}")
     public void updateAlert(@PathVariable Long id, @RequestBody AlertRequest alertRequest) {
         Alert alert = AlertMapper.fromRequest(alertRequest);
-        alertService.updateAlert(id, alert);
+        alertService.updateAlert(id, alertRequest.getPrice(), alertRequest.getPriceDifference());
     }
 
     @DeleteMapping("/{id}")

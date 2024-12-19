@@ -12,16 +12,10 @@ public class PriceFilter {
 
     private final BtcPrice BTC_PRICE_MARGIN = new BtcPrice(new BigDecimal(100));
     private BtcPrice comparisonPrice = null; // Initially null to signify no price yet
-    private final AlertRepository alertRepository;
-    private final AlertFactory alertFactory;
-    private final AlertSender alertSender;
+    private final AlertService alertService;
 
-    public PriceFilter(AlertRepository alertRepository,
-                       AlertSender alertSender,
-                       AlertFactory alertFactory) {
-        this.alertRepository = alertRepository;
-        this.alertSender = alertSender;
-        this.alertFactory = alertFactory;
+    public PriceFilter(AlertService alertService) {
+        this.alertService = alertService;
     }
 
     @KafkaListener(topics = "bitcoin-price-topic", groupId = "price-filter-group", containerFactory = "kafkaListenerContainerFactory")
@@ -40,12 +34,11 @@ public class PriceFilter {
         if (priceDifference.compareTo(BTC_PRICE_MARGIN.getValue()) > 0) {
             // define which users to send the alert to then:
             // todo: alertSend.sendAlert(alertFactory.createPriceAboveAlert(currentPrice, priceDifference));
-            alertRepository.saveAlert(
-                    alertFactory.createPriceAboveAlert(currentPrice, priceDifference));
+            alertService.sendTriggeredAlerts(priceEvent.price());
+
         } else {
             // todo: alertSend.sendAlert(alertFactory.createPriceBelowAlert(currentPrice, priceDifference));
-            alertRepository.saveAlert(
-                    alertFactory.createPriceBelowAlert(currentPrice, priceDifference));
+            alertService.sendTriggeredAlerts(priceEvent.price());
         }
 
         comparisonPrice = currentPrice;

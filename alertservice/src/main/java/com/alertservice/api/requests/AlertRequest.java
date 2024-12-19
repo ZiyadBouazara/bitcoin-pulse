@@ -2,21 +2,26 @@ package com.alertservice.api.requests;
 
 import com.alertservice.domain.models.BtcPrice;
 
+import java.math.BigDecimal;
+
 public class AlertRequest {
     private String symbol;
     private String email;
     private String phone;
     private BtcPrice price;
+    private BigDecimal priceDifference;
     private String text;
 
     public AlertRequest() {
     }
 
-    public AlertRequest(String symbol, String email, String phone, BtcPrice price, String text) {
+    public AlertRequest(String symbol, String email, String phone, BtcPrice price, BigDecimal priceDifference,
+                        String text) {
         this.symbol = symbol;
         this.price = price;
         this.email = email;
         this.phone = phone;
+        this.priceDifference = priceDifference;
         this.text = text;
     }
 
@@ -58,5 +63,13 @@ public class AlertRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public BigDecimal getPriceDifference() {
+        return priceDifference;
+    }
+
+    public void setPriceDifference(BigDecimal priceDifference) {
+        this.priceDifference = priceDifference;
     }
 }
