@@ -39,16 +39,16 @@ public class PriceFilter {
         BigDecimal priceDifference = currentPrice.getValue().subtract(comparisonPrice.getValue()).abs();
 
         if (priceDifference.compareTo(THRESHOLD.getValue()) > 0) {
+            // define which users to send the alert to then:
+            // todo: alertSend.sendAlert(alertFactory.createPriceAboveAlert(currentPrice, priceDifference));
             alertRepository.saveAlert(
                     alertFactory.createPriceAboveAlert(currentPrice, priceDifference));
-            System.out.println("Alert: Price difference above threshold: " + priceDifference);
         } else {
+            // todo: alertSend.sendAlert(alertFactory.createPriceBelowAlert(currentPrice, priceDifference));
             alertRepository.saveAlert(
                     alertFactory.createPriceBelowAlert(currentPrice, priceDifference));
-            System.out.println("Alert: Price difference below threshold: " + priceDifference);
         }
 
         comparisonPrice = currentPrice;
-        System.out.println("Updated COMPARISON_PRICE to: " + comparisonPrice.getValue());
     }
 }
