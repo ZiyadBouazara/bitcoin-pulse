@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain/ports"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/ports"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -65,7 +66,7 @@ func (c *BitcoinPriceConsumer) ProcessMessage(msg kafka.Message) error {
 		return err
 	}
 
-	c.logger.Infof("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
+	c.logger.Debugf("🚀 🚀 🚀 BTC Price Event received 🚀 🚀 🚀 %s", eventDTO.FormatLog())
 
 	priceEvent, err := dtos.ToPriceEvent(&eventDTO)
 	if err != nil {

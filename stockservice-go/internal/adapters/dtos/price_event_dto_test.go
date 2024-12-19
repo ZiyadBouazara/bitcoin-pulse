@@ -1,10 +1,11 @@
 package dtos_test
 
 import (
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+	"testing"
+
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
 	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/testutils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestToPriceEvent_Success(t *testing.T) {
@@ -19,7 +20,8 @@ func TestToPriceEvent_Success(t *testing.T) {
 
 func TestToPriceEvent_ErrorParsingFloat(t *testing.T) {
 	dto := &dtos.PriceEventDTO{
-		Price: "invalid",
+		ProductID: "BTC-USD",
+		Price:     "invalid",
 	}
 
 	event, err := dtos.ToPriceEvent(dto)

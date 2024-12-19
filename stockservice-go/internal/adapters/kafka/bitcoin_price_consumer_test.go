@@ -3,12 +3,13 @@ package kafka
 import (
 	"encoding/json"
 	"errors"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/testutils"
 	"testing"
 
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/domain"
-	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/infrastructure/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/adapters/dtos"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/core/domain"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/mocks"
+	"github.com/ZiyadBouazara/bitcoin-pulse/stockservice-go/internal/testutils"
+
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
