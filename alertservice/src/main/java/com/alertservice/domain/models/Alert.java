@@ -15,10 +15,6 @@ public record Alert(
         @Nullable
         String phone,
         @JsonProperty("price")
-        BtcPrice bitcoinPrice,
-        @JsonProperty("direction")
-        TrendDirection direction
+        BtcPrice bitcoinPrice
 ) {
-
-
 }

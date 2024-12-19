@@ -1,6 +1,5 @@
 package com.alertservice.domain.services;
 
-import com.alertservice.domain.models.Alert;
 import com.alertservice.domain.models.BtcPrice;
 import com.pricefetcherservice.domain.models.PriceEvent;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,7 +10,7 @@ import java.math.BigDecimal;
 @Service
 public class PriceFilter {
 
-    private final BtcPrice THRESHOLD = new BtcPrice(new BigDecimal(100));
+    private final BtcPrice BTC_PRICE_MARGIN = new BtcPrice(new BigDecimal(100));
     private BtcPrice comparisonPrice = null; // Initially null to signify no price yet
     private final AlertRepository alertRepository;
     private final AlertFactory alertFactory;
@@ -38,7 +37,7 @@ public class PriceFilter {
 
         BigDecimal priceDifference = currentPrice.getValue().subtract(comparisonPrice.getValue()).abs();
 
-        if (priceDifference.compareTo(THRESHOLD.getValue()) > 0) {
+        if (priceDifference.compareTo(BTC_PRICE_MARGIN.getValue()) > 0) {
             // define which users to send the alert to then:
             // todo: alertSend.sendAlert(alertFactory.createPriceAboveAlert(currentPrice, priceDifference));
             alertRepository.saveAlert(

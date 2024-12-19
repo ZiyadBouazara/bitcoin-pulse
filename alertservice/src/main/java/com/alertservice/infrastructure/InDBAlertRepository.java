@@ -10,7 +10,7 @@ public class InDBAlertRepository implements AlertRepository {
     }
 
     @Override
-    public Alert getAlert(String alertId) {
+    public Alert getAlert(Long alertId) {
         return null;
     }
 
@@ -20,7 +20,7 @@ public class InDBAlertRepository implements AlertRepository {
     }
 
     @Override
-    public void deleteAlert(String alertId) {
+    public void deleteAlert(Long alertId) {
 
     }
 }

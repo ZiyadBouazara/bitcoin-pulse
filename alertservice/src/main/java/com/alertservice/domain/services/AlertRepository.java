@@ -4,7 +4,7 @@ import com.alertservice.domain.models.Alert;
 
 public interface AlertRepository {
     void saveAlert(Alert alert);
-    Alert getAlert(String alertId);
+    Alert getAlert(Long alertId);
     void updateAlert(Alert alert);
-    void deleteAlert(String alertId);
+    void deleteAlert(Long alertId);
 }
